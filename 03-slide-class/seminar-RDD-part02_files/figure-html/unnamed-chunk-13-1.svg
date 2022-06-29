@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='1008.00pt' height='504.00pt' viewBox='0 0 1008.00 504.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<defs>
+  <clipPath id='cpMC4wMHwxMDA4LjAwfDAuMDB8NTA0LjAw'>
+    <rect x='0.00' y='0.00' width='1008.00' height='504.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHwxMDA4LjAwfDAuMDB8NTA0LjAw)'>
+<rect x='-0.00000000000013' y='0.00' width='1008.00' height='504.00' style='stroke-width: 1.16; stroke: #FFFFFF; fill: #FFFFFF;' />
+</g>
+<defs>
+  <clipPath id='cpNTQuMzR8MTAwMi4wMnwyMi41M3w0NzIuMDQ='>
+    <rect x='54.34' y='22.53' width='947.68' height='449.51' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTQuMzR8MTAwMi4wMnwyMi41M3w0NzIuMDQ=)'>
+<rect x='54.34' y='22.53' width='947.68' height='449.51' style='stroke-width: 1.16; stroke: none; fill: #FFFFFF;' />
+<polyline points='97.42,451.61 528.18,451.61 528.18,42.96 958.95,42.96 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<line x1='528.18' y1='472.04' x2='528.18' y2='22.53' style='stroke-width: 1.07; stroke: #00FF00; stroke-dasharray: 5.69,5.69; stroke-linecap: butt;' />
+</g>
+<g clip-path='url(#cpMC4wMHwxMDA4LjAwfDAuMDB8NTA0LjAw)'>
+<polyline points='54.34,472.04 54.34,22.53 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<text x='48.96' y='456.01' text-anchor='end' style='font-size: 14.00px; font-family: "Garamond";' textLength='18.07px' lengthAdjust='spacingAndGlyphs'>0%</text>
+<text x='48.96' y='353.85' text-anchor='end' style='font-size: 14.00px; font-family: "Garamond";' textLength='24.63px' lengthAdjust='spacingAndGlyphs'>25%</text>
+<text x='48.96' y='251.69' text-anchor='end' style='font-size: 14.00px; font-family: "Garamond";' textLength='24.63px' lengthAdjust='spacingAndGlyphs'>50%</text>
+<text x='48.96' y='149.53' text-anchor='end' style='font-size: 14.00px; font-family: "Garamond";' textLength='24.63px' lengthAdjust='spacingAndGlyphs'>75%</text>
+<text x='48.96' y='47.37' text-anchor='end' style='font-size: 14.00px; font-family: "Garamond";' textLength='31.19px' lengthAdjust='spacingAndGlyphs'>100%</text>
+<polyline points='51.35,451.61 54.34,451.61 ' style='stroke-width: 1.16; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='51.35,349.45 54.34,349.45 ' style='stroke-width: 1.16; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='51.35,247.29 54.34,247.29 ' style='stroke-width: 1.16; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='51.35,145.13 54.34,145.13 ' style='stroke-width: 1.16; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='51.35,42.96 54.34,42.96 ' style='stroke-width: 1.16; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='54.34,472.04 1002.02,472.04 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<polyline points='528.18,475.03 528.18,472.04 ' style='stroke-width: 1.16; stroke: #333333; stroke-linecap: butt;' />
+<text x='528.18' y='486.23' text-anchor='middle' style='font-size: 14.00px; font-family: "Garamond";' textLength='36.00px' lengthAdjust='spacingAndGlyphs'>Cutoff</text>
+<text x='528.18' y='498.02' text-anchor='middle' style='font-size: 14.00px; font-family: "Garamond";' textLength='106.94px' lengthAdjust='spacingAndGlyphs'>Running Variable X</text>
+<text transform='translate(14.78,247.29) rotate(-90)' text-anchor='middle' style='font-size: 14.00px; font-family: "Garamond";' textLength='104.99px' lengthAdjust='spacingAndGlyphs'>Proportion Treated</text>
+<text x='54.34' y='16.55' style='font-size: 16.80px; font-family: "Garamond";' textLength='162.75px' lengthAdjust='spacingAndGlyphs'>a)骤变不连续Sharp Design</text>
+</g>
+</svg>

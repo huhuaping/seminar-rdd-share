@@ -1,0 +1,915 @@
+\mainmatter
+
+# 引入协变量的RDD效应分析（儿童死亡率案例）{#lab-srdd-withcovs}
+
+```{r}
+#| echo = FALSE
+library(here)
+source(here("R/set-global-for-lab.R"), encoding = "UTF-8")
+source(here("R/load-pkg.R"), encoding = "UTF-8")
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 实验说明
+
+### 实验内容
+
+**实验目标**：引入协变量情况下，骤变RDD的局部线性回归估计及分析，复现**儿童死亡率案例**（包括**Table21.1、Figure 21.2a**的全部过程及结果（参看：HANSEN B. Econometrics[M].2021（作者手稿）. 第21章 Regression Discontinuity. ）
+
+主要内容包括：
+
+- 在引入两个额外协变量情形下，基于骤变RDD（SRDD）模型，进行局部线性回归方法（LLR）分析，估计其断点处置效应ATE（$\widehat{\theta}$）及其估计标准误。
+
+- 对比无协变量SRDD模型（上一次实验）和有协变量SRDD，对这两个模型进行综合比较，并得出相关结论
+
+
+### 材料准备
+
+- 软件环境：编译器为`Rstudio`（要求`R 4.1`及以上版本）
+
+- R代码文件：工作项目（R project）根目录下`Rscript/`文件夹内
+
+
+```{r, eval=FALSE}
+# don't run here ! 
+# only show you the code file path!
+source("../Rscript/hansen21-fig21-2a.R", encoding = "UTF-8")
+```
+
+:::notes
+
+**注意**：上述代码运行时间较长（约3-5分钟），为提高渲染效率代码文件仅需运行一次。
+:::
+
+
+## 案例描述
+
+### 死亡率案例（续）：背景说明
+
+
+**援助项目与儿童死亡率**：
+
+我们继续使用前面[@ludwig2007]的研究案例，来评估美国联邦政府脱贫援助项目（Head Start）对儿童死亡率的**骤变RDD**政策效应。现在我们考虑使用两个协变量（covariates）：
+
+- 县级**黑人人口占比**（`black pop percentage`）
+$Z_a$
+
+- 县级**城镇人口占比**（`urban pop percentage`）
+$Z_a$
+
+]
+
+- 上述两个协变量，本质上可以视作为**收入**变量（`income`）的**代理变量**（proxy）。
+
+- 下面我们将使用[@robinson1988]的**半参数效率**估计方法来评估项目援助的断点处置效应（RDD ATE）。
+
+
+
+### 读取案例数据
+
+
+```{r}
+##  This file generates Figure 21.2a and Table 21.1 Covariates
+##  Head Start RDD with Covariates
+##  This file uses the package haven
+##  This file uses the data file LM2007.dta
+
+####  The data file LM2007.dta is used ####
+library(haven)
+
+dt_path <- here::here("data/LM2007.dta")
+dat <- read_dta(dt_path)
+y <- dat$mort_age59_related_postHS
+x <- dat$povrate60
+Za <- dat$census1960_pctblack
+Zb <- dat$census1960_pcturban
+
+c <- 59.1984
+
+dt_head <- tibble(X= x,
+                  Y = y,
+                  Za = Za,
+                  Zb = Zb) %>%
+  mutate(D= ifelse(X>=c,1,0))
+```
+
+
+
+### 数据呈现
+
+
+```{r}
+dt_head %>%
+  add_column(obs = 1:nrow(.), .before = "X") %>%
+  DT::datatable(
+    caption = paste0("增加协变量的援助项目数据集(n=2783)"),
+    options = list(dom = "tip", pageLength =8))%>%
+  formatRound(c(2:5), digits = c(4,4,1,1))
+```
+
+
+
+- 样本数据的描述性统计如下：
+
+```{r}
+summary(dt_head)
+```
+
+
+
+### 数据分组描述性统计
+
+我们根据处置变量D进行数据分组，并进行描述性统计，统计分析代码如下：
+
+```{r}
+smry_grouped <- dt_head %>%
+  group_by(D) %>%
+  dplyr::summarize(n = n(),
+            x_mean = mean(X, na.rm =T),
+            x_min = min(X,na.rm = T),
+            x_max = max(X, na.rm = T),
+            x_sd = sd(X),
+            y_mean = mean(Y, na.rm =T),
+            y_min = min(Y,na.rm = T),
+            y_max = max(Y, na.rm = T),
+            y_sd = sd(Y),
+            za_mean = mean(Za, na.rm =T),
+            za_min = min(Za,na.rm = T),
+            za_max = max(Za, na.rm = T),
+            za_sd = sd(Za),
+            zb_mean = mean(Zb, na.rm =T),
+            zb_min = min(Zb,na.rm = T),
+            zb_max = max(Zb, na.rm = T),
+            zb_sd = sd(Zb)
+            ) %>%
+  pivot_longer(names_to = "stat", values_to = "value", -D) %>%
+  pivot_wider(names_from = D, values_from = value) %>%
+  rename_all(., ~c("stats","D0","D1"))
+```
+
+处置组和控制组描述性统计表如下：
+
+```{r}
+smry_grouped %>% 
+  arrange(desc(stats)) %>%
+  DT::datatable(
+    caption = paste0("处置组和控制组描述性统计(g=",n,")"),
+    options = list(dom = "tip", 
+                   pageLength =10,
+                   scrollX = TRUE))%>%
+  formatRound(c(2:3), digits = 2)
+```
+
+
+
+### 数据散点图
+
+```{r}
+#### basic plot ####
+
+lwd <- 0.6
+fsize <- 16
+
+p0 <- ggplot() +
+  geom_point(aes(X, Y),data = dt_head, pch=21,alpha=0.6) +
+  geom_vline(aes(xintercept=c),
+             color = "orange", lty = "dotted", lwd=lwd) +
+  labs(x= "X贫困线", y ="Y儿童死亡率") +
+  scale_y_continuous(breaks = seq(0,80,20), limits = c(0,80)) +
+  scale_x_continuous(breaks = seq(10,90,10), limits = c(10,90)) +
+  theme_bw() +
+  theme(text = element_text(size = fsize))
+```
+
+```{r}
+#| fig.cap = paste0("样本数据散点图n=`r n`")
+# show the scatter
+p0
+```
+
+
+## 过程0：设定相关参数和辅助计算工具
+
+
+### R运算代码
+
+考虑到对断点两侧的数据，我们要多次进行局部线性估计（LLR）、计算预测误差、计算标准误（从而计算置信区间），因此我们可以事先设计并封装好一些有用的**辅助函数**（辅助工具）。
+
+- 为了简化计算，我们这里不再进行LLR的最优谱宽选择过程，而是直接先验设定好一个初始值（$h=8$）。
+
+- 我们会多次分别对断点两侧运用LLR估计流程（我们已经在非参数局部回归估计中学习过了！）
+
+```{r}
+#### RDD Helper function ####
+
+# specify parameters and basic calculation
+h <- 8
+T <- as.numeric(x >= c)
+y1 <- y[T==0]
+y2 <- y[T==1]
+x1 <- x[T==0]
+x2 <- x[T==1]
+n1 <- length(y1)
+n2 <- length(y2)
+n <- n1+n2
+
+# specify bins
+g1 <- seq(15,59.2,.2)
+g2 <- seq(59.2,82,.2)
+G1 <- length(g1)
+G2 <- length(g2)
+
+# Helper function for  triangle kernel function
+TriKernel <- function(x) {
+  s6 <- sqrt(6)
+  ax <- abs(x)
+  f <- (1-ax/s6)*(ax < s6)/s6
+  return(f)
+}
+
+# Helper function for LLR estimation
+LL_EST <- function(y,x,g,h) {
+  G <- length(g)
+  m <- matrix(0,G,1)
+  z <- matrix(1,length(y),1)
+  for (j in 1:G){
+    xj <- x-g[j]
+    K <- TriKernel(xj/h)
+    zj <- cbind(z,xj)
+    zz <- t(cbind(K,xj*K))
+    beta <- solve(zz%*%zj,zz%*%y)
+    m[j] <- beta[1]
+  }
+  return(m)
+}
+
+# Helper function for forecast residuals
+LL_Residual <- function(y,x,h) {
+  n <- length(y)
+  e <- matrix(0,n,1)
+  z <- matrix(1,n,1)
+  for (j in 1:n){
+    xj <- x-x[j]
+    K <- TriKernel(xj/h)
+    K[j] <- 0
+    zj <- cbind(z,xj)
+    zz <- t(cbind(K,xj*K))
+    beta <- solve(zz%*%zj,zz%*%y)
+    e[j] <- y[j] - beta[1]
+  }
+  return(e)
+}
+
+# Helper function for standard error
+LL_SE <- function(y,x,g,h) {
+  G <- length(g)
+  s <- matrix(0,G,1)
+  z <- matrix(1,length(y),1)
+  e <- LL_Residual(y,x,h)
+  for (j in 1:G){
+    xj <- x-g[j]
+    K <- TriKernel(xj/h)
+    zj <- cbind(z,xj)
+    zz <- cbind(K,xj*K)
+    ZKZ <- solve(t(zz)%*%zj)
+    Ke <- K*e
+    ze <- cbind(Ke,xj*Ke)
+    V <- ZKZ%*%crossprod(ze)%*%ZKZ
+    s[j] = sqrt(V[1,1])
+  }
+  return(s)
+}
+
+```
+
+
+
+
+### 过程步骤解读：协变量RDD分析的规则策略
+
+在进行协变量RDD分析之前，我们设定如下的规则策略：
+
+- 规则1：我们设定**先验谱宽**为
+$h=`r number(h)`$，断点值设定为
+$c =59.1984\%$。
+
+- 规则2：分别设定断点两边**箱组中心点**序列值（center of bins）。我们将采用非对称箱组设置方法：
+
+> 
+- 控制组（断点左边）的评估范围为
+$[15, 59.2]$，序列间隔为`0.2`。评估总箱组数为
+$g1=`r G1`$，待评估序列值为
+$`r paste0(number(g1[1:5],0.1), collapse=', ')`, \cdots,`r paste0(number(g1[(G1-3):G1],0.1), collapse=', ')`$。
+- 处置组（断点右边）的评估范围为
+$[59.2, 82]$，序列间隔为`0.2`。评估总箱组数为
+$g2=`r G2`$，待评估序列值为
+$`r paste0(number(g2[1:5],0.1), collapse=', ')`, \cdots,`r paste0(number(g2[(G2-3):G2],0.1), collapse=', ')`$。
+
+- 规则3：如果使用局部线性估计法（LL），则采用**三角核函数**（triangle kenerl）。
+
+- 规则4：我们将使用[@robinson1988]的**半参数效率**估计方法来评估断点处置效应（RDD ATE）。
+
+
+## 过程2：协变量SRDD估计
+
+协变量SRDD过程（R代码）如下：
+
+
+```{r}
+#### RDD Estimation ####
+
+#### step 1: LL estimate Y on X ####
+## obtain residual of stage 1 
+e1 <- LL_Residual(y1,x1,h)
+e2 <- LL_Residual(y2,x2,h)
+e <- rbind(e1,e2)
+
+#### step 2: LL estimate Z on X ####
+## obtain residual of stage 2 
+Ra <- LL_Residual(Za,x,h)
+Rb <- LL_Residual(Zb,x,h)
+Z <- cbind(Za,Zb)
+R <- cbind(Ra,Rb)
+
+# step 3: OLS  ####
+## regress estimate residual of stage 1 on residual of stage 2
+## obtain the coefﬁcient and standard errors
+## no intercept !
+XXR <- solve(crossprod(R))     # inverse matrix
+beta <- XXR%*%(t(R)%*%e)
+u <- e - R%*%beta
+Ru <- R*(u%*%matrix(1,1,ncol(R)))
+V <- XXR%*%crossprod(Ru)%*%XXR    # robust se
+sbeta <- sqrt(diag(V))
+
+tstat <- beta/sbeta
+pvalue <- 2*(1-pnorm(abs(tstat)))
+betas <- cbind(beta,sbeta,tstat,pvalue)
+
+#### step 4: Construct the residual ####
+## obtain constructed residual
+
+zm <- colMeans(Z)%*%beta
+
+Z1 <- Z[T==0,]
+Z2 <- Z[T==1,]
+yZ <- y - Z%*%beta
+yZ1 <- y1 - Z1%*%beta
+yZ2 <- y2 - Z2%*%beta
+
+#### step 5: LL ATE estimate ####
+## LL estimate of constructed residual on X
+## obtain  ATE and standard errors
+
+m1 <- LL_EST(yZ1,x1,g1,h) + matrix(zm,G1,1)
+m2 <- LL_EST(yZ2,x2,g2,h) + matrix(zm,G2,1)
+s1 <- LL_SE(yZ1,x1,g1,h)
+s2 <- LL_SE(yZ2,x2,g2,h)
+L1 <- m1-1.96*s1
+U1 <- m1+1.96*s1
+L2 <- m2-1.96*s2
+U2 <- m2+1.96*s2
+
+# rdd effect
+theta_lft <- m1[G1]
+theta_rgt <- m2[1]
+theta <- m2[1]-m1[G1]
+setheta <- sqrt(s1[G1]^2 + s2[1]^2)
+tstat <- theta/setheta
+pvalue <- 2*(1-pnorm(abs(tstat)))
+```
+
+
+## 过程3：将RDD估计结果整理成相关表格
+
+
+### 将断点两侧的m(x)估计结果整理成表格（R代码）
+
+```{r}
+#### tibble of mx estimate related ####
+
+tbl_mx1 <- tibble(group = "control",
+                  xg = g1,
+                  mx=as.vector(m1),
+                  s = as.vector(s1),
+                  lwr = as.vector(L1), 
+                  upr = as.vector(U1))
+
+tbl_mx2 <- tibble(group = "treat",
+                  xg = g2,
+                  mx=as.vector(m2),
+                  s = as.vector(s2),
+                  lwr = as.vector(L2), 
+                  upr = as.vector(U2))
+
+tb_mxh <- bind_rows(tbl_mx1, tbl_mx2)
+```
+
+
+### 将RDD预测误差整理成表格（R代码）
+
+```{r}
+
+#### tibble of sample result ####
+tbl_residual <- dt_head %>%
+  mutate(e = as.vector(e),   # residual of LL 1
+         Ra = as.vector(Ra),   # residual of LL 2
+         Rb = as.vector(Rb),
+         RZ = as.vector(yZ) # residual of construct
+         )
+```
+
+
+### 将最终RDD断点效应整理成表格（R代码）
+
+
+```{r}
+#### tibble of estimate result ####
+tbl_theta02 <- tibble(
+  model = "covariate",
+  pars = c("theta", "black","urban"),
+  est = c(theta, as.vector(beta)),
+  se  = c(setheta, as.vector(sbeta))
+)
+```
+
+
+## 过程4：绘制RDD分析图（mx估计值）
+
+### 对绘制底图（R代码）
+
+
+```{r}
+
+lwd <- 0.6
+lwadd <- 0.2
+
+p00 <- ggplot() +
+  geom_point(aes(X, Y),data = dt_head, pch=21,alpha=0.3) +
+  geom_vline(aes(xintercept=c),
+             color = "red", lty = "dotted", lwd=lwd) +
+  labs(x= "X贫困线", y ="Y儿童死亡率") +
+  scale_y_continuous(breaks = seq(0,5,1), limits = c(0,5)) +
+  scale_x_continuous(breaks = seq(10,85,10), limits = c(10,85)) +
+  theme_bw() +
+  theme(text = element_text(size = fsize))
+
+```
+
+
+### 对断点左边绘制mx估计图（R代码）
+
+```{r}
+# mx plot for left part
+p_mxh1 <- p00 +
+  geom_line(aes(x = xg, y = mx, 
+                color="m1", lty="m1"),
+            lwd = lwd+lwadd,
+            data = base::subset(tb_mxh,group=="control")) +
+  scale_color_manual(
+    name="",
+    breaks = c("m1"),
+    labels = c(expression(m(x):control)),
+    values=c("purple"))+
+  scale_linetype_manual(
+    name="",
+    breaks = c("m1"),
+    labels = c(expression(m(x):control)),
+    values=c("solid"))+
+  theme(legend.position = "right",
+        text = element_text(size = fsize))
+```
+
+### 对断点右边绘制mx估计图（R代码）
+
+```{r}
+# mx plot for right part
+p_mxh2 <- p00 +
+  geom_line(aes(x = xg, y = mx, 
+                color="m2", lty="m2"),
+            lwd = lwd+lwadd,
+            data = base::subset(tb_mxh,group=="treat")) +
+  scale_color_manual(
+    name="",
+    breaks = c("m2"),
+    labels = c(expression(m(x):treat)),
+    values=c("blue"))+
+  scale_linetype_manual(
+    name="",
+    breaks = c("m2"),
+    labels = c(expression(m(x):treat)),
+    values=c("solid"))+
+  theme(legend.position = "right",
+        text = element_text(size = fsize))
+```
+
+### 同时对断点两边绘制mx估计图（R代码）
+
+```{r}
+# mx plot for both side
+p_mxh <- p00 +
+  geom_line(aes(x = xg, y = mx, 
+                color="m1", lty="m1"),
+            lwd = lwd+lwadd,
+            data = base::subset(tb_mxh,group=="control")) +
+  geom_line(aes(x = xg, y = mx, 
+                color="m2", lty="m2"), 
+            lwd = lwd+lwadd,
+            data = base::subset(tb_mxh,group=="treat")) +
+  scale_color_manual(
+    name="",
+    breaks = c("m1", "m2"),
+    labels = c(expression(m(x):control),expression(m(x):treat)),
+    values=c("purple", "blue"))+
+  scale_linetype_manual(
+    name="",
+    breaks = c("m1", "m2"),
+    labels = c(expression(m(x):control),expression(m(x):treat)),
+    values=c("solid", "solid"))+
+  theme(legend.position = "right",
+        text = element_text(size = fsize))
+```
+
+## 过程5：绘制RDD置信带图
+
+
+### 对断点左边绘制置信带（R代码）
+
+```{r}
+#### Plot Confidence Bands ####
+
+# band plot for left side
+p_band_left <- p_mxh1 +
+  geom_ribbon(aes(x=xg,ymin = lwr, ymax = upr),
+              data = base::subset(tb_mxh,group=="control"),
+              alpha = 0.2) 
+
+```
+
+
+### 对断点右边绘制置信带（R代码）
+
+```{r}
+# band plot for right side
+p_band_right <- p_mxh2 +
+  geom_ribbon(aes(x=xg,ymin = lwr, ymax = upr),
+              data = base::subset(tb_mxh,group=="treat"),
+              alpha = 0.2) 
+```
+
+
+### 对断点两边同时绘制置信带（R代码）
+
+```{r}
+# band plot for right side
+# band plot for both side
+p_band_cov <- p_mxh +
+  geom_ribbon(aes(x=xg,ymin = lwr, ymax = upr),
+              data = base::subset(tb_mxh,group=="control"),
+              alpha = 0.2) +
+  geom_ribbon(aes(x=xg,ymin = lwr, ymax = upr),
+              data = base::subset(tb_mxh,group=="treat"),
+              alpha = 0.2) +
+  geom_text(aes(x = c-3, y = theta_lft, 
+                label=number(theta_lft, 0.0001)),
+            color = "purple")+
+  geom_text(aes(x = c+3, y = theta_rgt, 
+                label=number(theta_rgt, 0.0001)),
+            color = "blue") +
+  geom_segment(aes(x=c, xend = c,
+                   y= theta_lft, yend = theta_rgt),
+               arrow = arrow(length = unit(0.1,"cm"),
+                             type = "closed"),
+               lty = "solid", color= "orange", lwd=lwd)  +
+  geom_text(aes(x = c+5, y=theta_lft+0.5*theta), 
+            label = TeX(paste0("\\hat{\\theta}=",number(theta,0.0001))),
+            color= "orange", size=4)
+```
+
+
+## 协变量RDD分析的过程步骤解读
+
+
+### 第1阶段LLR估计残差
+
+- **步骤1**：直接采用前面的局部线性回归方法（LLR），用
+$Y_i$对
+$X_i$进行LL回归，得到第1阶段的**结果变量**的拟合值
+$\widehat{m}_i = \widehat{m}_i(X_i)$，并进一步构造**留一法**残差<sup>a</sup> $Y_i - \widehat{m}_i$
+
+```{r}
+tbl_residual %>%
+  add_column(obs = 1:nrow(.), .before = "X") %>%
+  select(obs,D,X,Y,Za,Zb,e) %>%
+  DT::datatable(
+    caption = paste0("RDD LL估计得到的残差(n=",n,")"),
+    options = list(dom = "tip", pageLength =6))%>%
+  formatRound(c(3:7), digits = c(4,4,1,1,4))
+```
+
+
+> <sup>a</sup> 这个阶段的残差序列用`e`命名。
+
+
+
+### 第2阶段LLR估计残差
+
+- **步骤2**：同上，依次做
+$Z_a$对
+$X_i$、
+$Z_b$对
+$X_i$的**局部线性回归**（LLR），并分别得到**协变量**的拟合值
+$\widehat{g}_{1i},\widehat{g}_{2i}$，及其对应残差<sup>a</sup>
+$(Z_a-\widehat{g}_{1i}),(Z_b-\widehat{g}_{2i})$
+
+
+```{r}
+tbl_residual %>%
+  add_column(obs = 1:nrow(.), .before = "X") %>%
+  select(obs,D,X,Y,Za,Zb,e,Ra,Rb) %>%
+  DT::datatable(
+    caption = paste0("RDD LL估计得到的残差(n=",n,")"),
+    options = list(dom = "tip", pageLength =6))%>%
+  formatRound(c(3:9), digits = c(4,4,1,1,4,4,4))
+```
+
+
+> <sup>a</sup> 这个阶段的两个残差序列分别用`Ra`和`Rb`命名。
+
+
+
+### 第3阶段OLS估计(模型)
+
+- **步骤3**：利用前面两个阶段的残差，做
+$Y_i -m_{i}$对
+$Z_{i1}-\widehat{g}_{1i},Z_{i2}-\widehat{g}_{2i},\ldots,Z_{ik}-\widehat{g}_{ki}$的**无截距**的普通最小二乘回归（OLS），并得到**估计系数**
+$\hat{\beta}$及其**标准误**
+
+$$\begin{align}
+(Y_i -m_{i}) &= \hat{\beta}_1(Z_{ia}-\widehat{g}_{1i})+\hat{\beta}_2(Z_{ib}-\widehat{g}_{2i})\\
+e&=\hat{\beta}_{1}R_a + \hat{\beta}_{2}R_a 
+\end{align}$$
+
+
+### 第3阶段OLS估计（结果）
+
+- 上述模型，未矫正标准误下OLS估计的结果如下<sup>a</sup> ：
+
+```{r, results="asis"}
+mod_res <- formula(e~-1+Ra+Rb)
+lx_est <- xmerit::lx.est(lm.mod = mod_res , 
+                         lm.dt = tbl_residual, 
+                         lm.n = 5,
+                         opt = c("s","t","p"), 
+                         inf = c("over"),
+                         digits = c(4,4,2,4))
+
+```
+
+- 上述模型，进行稳健标准误矫正OLS估计的结果如下<sup>b</sup> ：
+
+```{r}
+library(robustbase)
+library(sandwich)
+library(lmtest)
+library(modelr)
+library(broom)
+# regression with robust standard errors using R
+## see [url](https://www.brodrigues.co/blog/2018-07-08-rob_stderr/)
+
+lm.out <- lm(formula = mod_res, data =tbl_residual )
+
+broom::tidy(
+  lmtest::coeftest(lm.out, 
+                   vcov = sandwich::vcovHC(lm.out))
+  ) %>%
+  DT::datatable(
+    caption = paste0("稳健标准误OLS估计(n=",n,")"),
+    options = list(dom = "t", pageLength =6))%>%
+  formatRound(c(2:5), digits = c(4,4,2,4))
+```
+
+
+
+> <sup>a b</sup> 两种OLS估计程序下，回归系数都相同，只是系数对应的标准误不一样。这里我们仅需要用到回归系数，因此不影响后续步骤。
+
+
+### 第4阶段构造残差
+
+- **步骤4**：利用前面的OLS估计系数，我们就可以构造得到残差
+$\hat{e}_i=Y_i - Z^{\prime}_i\hat{\beta}$
+
+
+```{r}
+tbl_residual %>%
+  add_column(obs = 1:nrow(.), .before = "X") %>%
+  select(obs,D,X,Y,Za,Zb,e,Ra,Rb,RZ) %>%
+  DT::datatable(
+    caption = paste0("RDD LL估计得到的残差(n=",n,")"),
+    options = list(dom = "tip", pageLength =6))%>%
+  formatRound(c(3:10), digits = c(4,4,1,1,4,4,4,4))
+```
+
+
+> <sup>a</sup> 这个步骤构造出来的残差序列`RZ`。
+
+
+### 条件期望函数CEF m(x)的LLR估计结果
+
+- **步骤5**：再次采用RDD局部线性回归方法（LLR），进行
+$\hat{e}_i$对
+$X_i$的回归，并计算得到非参数估计量
+$\widehat{m}(x)$，断点效应估计值
+$\hat{\theta}$及其标准误。
+
+
+```{r}
+tb_mxh %>%
+  add_column(index = 1:nrow(.), .before = "xg") %>%
+  select(index,group, xg,mx) %>%
+  DT::datatable(caption = "局部线性估计LL方法对m(x)的估计结果",
+                options = list(dom ="tip", 
+                               pageLength =6,
+                               scrollX = TRUE)) %>%
+  formatRound(c(3), digits = c(1))%>%
+  formatRound(c(4), digits = c(4))
+```
+
+
+
+基于此，我们可以分别得到CEF m(x)在断点左侧（控制组）的估计图
+
+```{r, fig.cap = "m(x)在断点左侧（控制组）的估计图"}
+p_mxh1
+```
+
+类似地，也可以得到CEF m(x)在断点右侧（处置组）的估计图
+
+
+```{r, fig.cap = "m(x)在断点断点右侧（处置组）的估计图"}
+p_mxh2
+```
+
+综合上面，得到CEF m(x)在断点两侧的估计图：
+
+
+```{r, fig.cap = "m(x)在断点断点两侧的估计图"}
+p_mxh
+```
+
+
+
+### 条件期望函数CEF m(x)的标准差和置信区间
+
+- 同前，进一步计算得到CEF估计值的方差和标准差以及95%置信区间
+
+
+```{r}
+tb_mxh %>%
+  add_column(index = 1:nrow(.), .before = "xg") %>%
+  select(index, group,xg,mx,s,lwr,upr) %>%
+  #mutate(s2 = s^2) %>%
+  DT::datatable(caption = "m(x)的样本方差和标准差估计结果",
+                options = list(dom ="tip", 
+                               pageLength =8,
+                               scrollX = TRUE)) %>%
+  formatRound(c(3), digits = c(1))%>%
+  formatRound(c(4:7), digits = c(4))
+```
+
+
+断点左侧（控制组）的置信带图示如下：
+
+```{r, fig.cap="断点左侧（控制组）的置信带"}
+p_band_left
+```
+
+断点右侧（处置组）的置信带图示如下：
+
+```{r, fig.cap="断点右侧（处置组）的置信带"}
+p_band_right
+```
+
+综合起来，断点两侧的置信带图示如下：
+
+```{r  fig.cap="断点两侧的置信带"}
+p_band_cov
+```
+
+
+
+---
+
+### RDD断点处置效应计算结果
+
+
+- 根据**断点处置效应定理**，可以得到在断点
+$x=c=`r number(c, 0.0001)`$处对总体平均处置效应
+$\bar{\theta}$的样本估计结果
+$\hat{\theta}$：
+
+$$\begin{align}
+\widehat{\theta}
+&=\left[\boldsymbol{\widehat{\beta}_{1}}(c)\right]_{1}-\left[\boldsymbol{\widehat{\beta}_{0}}(c)\right]_{1}\\
+&=\hat{m}(c+)-\widehat{m}(c-)\\
+&= `r number(theta_lft, 0.0001)` - `r number(theta_rgt,0.0001)`
+= `r number(theta, 0.0001)`
+\end{align}$$
+
+
+
+- 断点处置效应估计值为
+$\hat{\theta}=`r number(theta,0.0001)`$。
+
+
+> 
+- 断点左边的条件期望(CEF)的估计值
+$\widehat{m}(c-)=`r number(theta_lft, 0.0001)`$；
+- 断点右边的条件期望(CEF)的估计值
+$\widehat{m}(c+)=`r number(theta_rgt,0.0001)`$；
+
+
+
+- **结论**：援助项目的实施，减低了儿童死亡率，使得10万个孩子中约`r number(theta,0.0001)`个小孩免于遭受死亡。相比不实施项目援助，儿童死亡率由`r number(theta_lft, 0.0001)`，下降到`r number(theta_rgt,0.0001)`，降幅接近50%。
+
+---
+
+### RDD断点处置效应的估计误差及显著性检验
+
+- 进一步地，估计系数
+$\hat{\theta}$的**渐进方差**为两个方差协方差矩阵第一个对角元素之和：
+
+$$\begin{align}
+\text{Var}{(\hat{\theta})}
+&=\left[\widehat{\boldsymbol{V}}_{0}\right]_{11}+\left[\widehat{\boldsymbol{V}}_{1}\right]_{11}\\
+&= `r number(v_g1, 0.0001)` + `r number(v_g2, 0.0001)`
+= `r number(v_g1+v_g2, 0.0001)`\\
+se({(\hat{\theta})}) &= \sqrt{\text{Var}{(\hat{\theta})}}
+= \sqrt{`r number(v_g1+v_g2, 0.0001)`}
+=`r number(setheta, 0.0001)`
+\end{align}$$
+
+- 因此RDD断点处置效应估计值
+$\hat{\theta}$的**标准误**为
+$se({\hat{\theta}}) =`r number(setheta, 0.0001)`$；最后我们可以计算得到**RDD断点处置效应**对应的t统计量：
+$t^{\ast}=\frac{\hat{\theta}}{se(\hat{\theta})}=`r number(tstat,0.01)`$，其概率值为
+$p=`r number(pvalue,0.0001)`$.
+
+- 综上，RDD结果表明援助项目降低了儿童死亡率，使得10万个孩子中约1.56个小孩免于遭受死亡。并且t统计量检验表明，援助项目在降低了儿童死亡率上具有统计显著性（置信度超过95%）。
+
+## 过程6：无协变量SRDD和有协变量SRDD的比较
+
+### R运算代码
+
+
+
+- 比较Hansen Head Start案例基准RDD和协变量RDd
+
+<!---- 需要事先依次运行`fig21-1b.R`和`fig21-2a.R`--->
+
+```{r}
+tbl_theta <- bind_rows(
+  tbl_theta01,  # baseline RDD
+  tbl_theta02   # coviriate RDD
+  ) %>%
+  pivot_longer(names_to = "stats", values_to = "value", est:se) %>%
+  pivot_wider(names_from = "model", values_from ="value" )
+```
+
+
+
+### 过程步骤解读1：系数和标准误比较
+
+```{r}
+tbl_theta %>%
+  DT::datatable(
+    caption = paste0("基准RDD和协变量RDD估计结果对比"),
+    options = list(dom = "t", pageLength =6))%>%
+  formatRound(c(3:4), digits = c(4))
+```
+
+- 结论1：与基准RDD相比，两个协变量的引入没有明显改变断点处置效应估计值大小。
+
+- 结论2：但是是否引入协变量，对CEF估计值
+$\widehat{m}(x)$的影响较大。可以看到基准RDD更陡峭，而协变量RDD更平缓。（见后面附图对比）
+
+- 结论3：考虑到两个协变量可以视作收入的**代理变量**，可以看到黑人人口比重负向影响儿童死亡率，而城镇人口比重正向影响儿童死亡率。
+
+### 过程步骤解读2：CEF估计值图形比较
+
+
+```{r}
+#| fig.cap = "基准RDD：局部线性回归及断点效应估计"
+p_band_wrapper
+```
+
+
+
+```{r}
+#| fig.cap = "协变量RDD：局部线性回归及断点效应估计"
+p_band_cov
+```
+
+## 参考文献{-}
+
+<div id="refs"></div>

@@ -1,0 +1,41 @@
+--- 
+title: "高级计量暑期研讨"
+author: "胡华平"
+date: "`r Sys.Date()`"
+documentclass: ctexbook
+bibliography: [bib/causality-analysis.bib, bib/wp-xian.bib]
+biblio-style: apalike
+link-citations: yes
+csl: 'bib/china-national-standard-gb-t-7714-2015-author-date-hhp.csl'
+tables: yes
+colorlinks: yes
+lot: yes
+lof: yes
+geometry: [a4paper, top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]
+site: bookdown::bookdown_site
+description: "高级计量经济学系列专题。"
+---
+
+\frontmatter
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(out.width = '90%', fig.align = 'center')
+```
+
+# 前言{#preface .unnumbered}
+
+你好，世界(Hello World！)。
+
+欢迎所有能看到这里的朋友们！
+
+欢迎参加2022年西北农林科技大学经济管理学院高级计量经济学暑期培训班！
+
+大约花费两天时间，我将讲授**非参数估计方法**和**RDD方法**两个内容模块。
+
+这里给大家的是相关配套案例和R代码分析！
+
+感谢开源编程世界！
+
+希望R语言开源统计社区因为你们的关注和加入而更加活跃和充满生命力！
+
+

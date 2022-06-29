@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='792.00pt' height='432.00pt' viewBox='0 0 792.00 432.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<defs>
+  <clipPath id='cpMC4wMHw3OTIuMDB8MC4wMHw0MzIuMDA='>
+    <rect x='0.00' y='0.00' width='792.00' height='432.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHw3OTIuMDB8MC4wMHw0MzIuMDA=)'>
+<rect x='0.00' y='0.00' width='792.00' height='432.00' style='stroke-width: 1.16; stroke: #FFFFFF; fill: #FFFFFF;' />
+</g>
+<defs>
+  <clipPath id='cpNTQuMzR8Nzg2LjAyfDIyLjUzfDQwMC4wNA=='>
+    <rect x='54.34' y='22.53' width='731.68' height='377.51' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTQuMzR8Nzg2LjAyfDIyLjUzfDQwMC4wNA==)'>
+<rect x='54.34' y='22.53' width='731.68' height='377.51' style='stroke-width: 1.16; stroke: none; fill: #FFFFFF;' />
+<polyline points='87.60,382.88 420.18,382.88 420.18,39.69 752.76,39.69 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<line x1='420.18' y1='400.04' x2='420.18' y2='22.53' style='stroke-width: 1.07; stroke: #00FF00; stroke-dasharray: 5.69,5.69; stroke-linecap: butt;' />
+</g>
+<g clip-path='url(#cpMC4wMHw3OTIuMDB8MC4wMHw0MzIuMDA=)'>
+<polyline points='54.34,400.04 54.34,22.53 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<text x='48.96' y='387.29' text-anchor='end' style='font-size: 14.00px; font-family: "Garamond";' textLength='18.07px' lengthAdjust='spacingAndGlyphs'>0%</text>
+<text x='48.96' y='301.49' text-anchor='end' style='font-size: 14.00px; font-family: "Garamond";' textLength='24.63px' lengthAdjust='spacingAndGlyphs'>25%</text>
+<text x='48.96' y='215.69' text-anchor='end' style='font-size: 14.00px; font-family: "Garamond";' textLength='24.63px' lengthAdjust='spacingAndGlyphs'>50%</text>
+<text x='48.96' y='129.89' text-anchor='end' style='font-size: 14.00px; font-family: "Garamond";' textLength='24.63px' lengthAdjust='spacingAndGlyphs'>75%</text>
+<text x='48.96' y='44.09' text-anchor='end' style='font-size: 14.00px; font-family: "Garamond";' textLength='31.19px' lengthAdjust='spacingAndGlyphs'>100%</text>
+<polyline points='51.35,382.88 54.34,382.88 ' style='stroke-width: 1.16; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='51.35,297.09 54.34,297.09 ' style='stroke-width: 1.16; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='51.35,211.29 54.34,211.29 ' style='stroke-width: 1.16; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='51.35,125.49 54.34,125.49 ' style='stroke-width: 1.16; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='51.35,39.69 54.34,39.69 ' style='stroke-width: 1.16; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='54.34,400.04 786.02,400.04 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<polyline points='420.18,403.03 420.18,400.04 ' style='stroke-width: 1.16; stroke: #333333; stroke-linecap: butt;' />
+<text x='420.18' y='414.23' text-anchor='middle' style='font-size: 14.00px; font-family: "Garamond";' textLength='36.00px' lengthAdjust='spacingAndGlyphs'>Cutoff</text>
+<text x='420.18' y='426.02' text-anchor='middle' style='font-size: 14.00px; font-family: "Garamond";' textLength='106.94px' lengthAdjust='spacingAndGlyphs'>Running Variable X</text>
+<text transform='translate(14.78,211.29) rotate(-90)' text-anchor='middle' style='font-size: 14.00px; font-family: "Garamond";' textLength='104.99px' lengthAdjust='spacingAndGlyphs'>Proportion Treated</text>
+<text x='54.34' y='16.55' style='font-size: 16.80px; font-family: "Garamond";' textLength='162.75px' lengthAdjust='spacingAndGlyphs'>a)骤变不连续Sharp Design</text>
+</g>
+</svg>

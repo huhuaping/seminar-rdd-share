@@ -1,0 +1,25 @@
+book_filename: seminar
+clean: ["bib/packages.bib"]
+#rmd_subdir: ""
+rmd_files: ["index.Rmd",
+    "02-lab-exercise/introduction.Rmd",
+    "02-lab-exercise/RDD-lab02-mean-estimation.Rmd",
+    "02-lab-exercise/RDD-lab03-local-regression.Rmd",
+    "02-lab-exercise/RDD-lab04-case-wage.Rmd",
+    "02-lab-exercise/RDD-lab05-head-start-without-covs.Rmd",
+    "02-lab-exercise/RDD-lab06-head-start-with-covs.Rmd",
+    "02-lab-exercise/appendix.Rmd"]
+#output_dir: "book-output"
+delete_merged_file: true
+#new_session: true
+language:
+  label:
+    fig: "图 "
+    tab: "表 "
+    def: "定义 "
+    thm: "定理 "
+    prp: "假设 "
+    proof: "证明 "
+  ui:
+    edit: "编辑"
+    chapter_name: ["Lab ", ""]

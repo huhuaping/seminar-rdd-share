@@ -1,0 +1,591 @@
+\mainmatter
+
+# 均值估计（模拟数据）{#lab-mean-est}
+
+```{r}
+#| echo = FALSE
+library(here)
+source(here("R/set-global-for-lab.R"), encoding = "UTF-8")
+source(here("R/load-pkg.R"), encoding = "UTF-8")
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 实验说明
+
+### 实验内容
+
+
+**实验目标**：非参数均值估计，复现**Figure 19.1a**计算过程及结果。（参看：HANSEN B. Econometrics[M].2021（作者手稿）. 第19章 Nonparametric Regression. ）
+
+主要内容包括：
+
+- 箱组均值估计
+
+- 滚动均值估计
+
+- 核函数均值估计
+
+
+### 材料准备
+
+- 软件环境：编译器为`Rstudio`（要求`R 4.1`及以上版本）
+
+- R代码文件：工作项目（R project）根目录下的`Rscript/hensen21-fig19-1a.R`文件夹
+
+
+```{r, eval=FALSE}
+# don't run here ! 
+# only show you the code file path!
+source(here("Rscript/hensen21-fig19-1a.R"), encoding = "UTF-8")
+
+```
+
+## 数据集描述
+
+为了更好地进行数据验证，我们将根据如下规则生成蒙特卡洛模拟数据集：
+
+$$\begin{align}
+Y_i &= m(X) +e_i 
+=\frac{sin(\frac{\pi}{4}\cdot(X_i-2))}{\frac{\pi}{4}\cdot(X_i-2)} +e_i\\ 
+X_i &\sim U(0,10)\\ 
+e_i &\sim N(0, 2)\\
+n &=100
+\end{align}$$
+
+- 此时，我们具有**上帝视角**，实际上已经知道**数据生成机制**（DGP）
+
+- 此时，我们心里面已知真实模型为**非线性的**
+
+```{r}
+n <- 100
+xm <- 10
+set.seed(180)         # for reproducible
+xdat <- runif(n,0,xm)
+a <- pi/4
+m <- sin((xdat-2)*a)/((xdat-2)*a)
+ydat <- m + rnorm(n)/4
+dt <- tibble(index = 1:length(xdat), X = xdat, Y = ydat)
+
+```
+
+
+
+### 数据呈现
+
+
+```{r}
+dt %>%
+  #add_column(obs = 1:nrow(.), .before = "X") %>%
+  DT::datatable(
+    caption = paste0("模拟的样本数据集(n=",n,")"),
+    options = list(dom = "tip", pageLength =8))%>%
+  formatRound(c(2:3), digits = 4)
+```
+
+
+
+- 样本数据的描述性统计如下：
+
+```{r}
+summary(dt)
+```
+
+
+
+### 数据散点图
+
+```{r}
+# basic scatter plot
+p0 <- ggplot() +
+  geom_point(aes(X, Y),data = dt, pch=21) +
+  labs(x= "自变量X", y ="因变量Y") +
+  scale_x_continuous(breaks = seq(0,10,1), 
+                     limits = c(0,10)) +
+  scale_y_continuous(breaks = seq(-1,2,0.5), 
+                     limits = c(-1,2)) +
+  theme_bw()
+```
+
+```{r}
+#| fig.cap = "样本数据散点图n=100"
+# show the scatter
+p0
+```
+
+
+## 均值估计
+
+- 对于箱组均值均值估计：箱组数为`n=5`
+
+$$\begin{align}
+\hat{m}(x)=\frac{\sum_{i=1}^{n}  \mathbb{1}\left\{\left|X_{i}-x\right| \leq h\right\} \cdot Y_{i}}{\sum_{i=1}^{n}  \mathbb{1}\left\{\left|X_{i}-x\right| \leq h\right\}} 
+\end{align}$$
+
+- 对于滚动箱组均值估计：箱组数为`n=1001`
+
+$$\begin{align}
+\hat{m}(x)=\frac{\sum_{i=1}^{n}  \mathbb{1}\left\{\left|X_{i}-x\right| \leq h\right\} \cdot Y_{i}}{\sum_{i=1}^{n}  \mathbb{1}\left\{\left|X_{i}-x\right| \leq h\right\}} 
+\end{align}$$
+
+
+- 对于核均值估计：箱组数为`n=1001`
+
+$$\begin{align}
+\hat{m}_{\mathrm{nw}}(x)=\frac{\sum_{i=1}^{n} K\left(\frac{X_{i}-x}{h}\right) Y_{i}}{\sum_{i=1}^{n} K\left(\frac{X_{i}-x}{h}\right)}
+\end{align}$$
+
+三者的具体代码计算如下：
+
+```{r}
+#### calculate ####
+h1 <- 1          # for binned
+h2 <- h1/sqrt(3) # for NW
+
+x0 <- seq(1,9,2) # bins break
+x0n <- length(x0)
+# index of Logic value in each bins
+k0 <- (abs(x0%*%matrix(1,1,n)-matrix(1,x0n,1)%*%t(xdat)) <= h1)
+# binned means
+m0 <- (k0%*%ydat)/rowSums(k0)
+
+# create new x with n=1001
+x <- seq(0,xm,.01)
+xn <- length(x)      # 1001
+
+# for Rolling, dim(k1)=c(1001, 100)
+k1 <- (abs(x%*%matrix(1,1,n)-matrix(1,xn,1)%*%t(xdat)) <= h1)
+m1 <- (k1%*%ydat)/rowSums(k1)
+
+# for NW, dim(k2)=c(1001, 100)
+k2 <- dnorm(abs(x%*%matrix(1,1,n)-matrix(1,xn,1)%*%t(xdat))/h2)
+m2 <- (k2%*%ydat)/rowSums(k2)
+```
+
+
+## 整合计算结果
+
+### 基于箱组数的结果整合（N=1001）
+
+根据前面的计算，我们把三种方法的箱组均值计算过程及结果组合到一张表里来：
+
+```{r}
+tbl_result <- tibble(id = 1:length(x),
+                     x = x,
+                     x_upr = x +0.01) %>%  # N=1001 bins
+  # now n=100 bins
+  mutate(bd = cut_interval(x,length = 2, right=FALSE)) %>%
+  mutate(
+    lwr = as.numeric(str_extract(bd, "(\\d{1})(?=\\,)")),
+    upr = as.numeric(str_extract(bd, "(?<=\\,)(\\d{1,2})")),
+    mid = 0.5*(lwr+ upr)
+    ) %>%
+  # binnd with h1 =2
+  mutate(lft = x-h1,
+         rgt = x +h1,
+         bins = str_c('[',lft,',',rgt, ')')) %>%
+  # add all means estimated
+  mutate(m0 = rep(m0, times=c(200,200,200,200,201)),
+         m1 = as.vector(m1),
+         m2 = as.vector(m2))
+```
+
+下面展示数据表结果：
+
+```{r}
+tbl_result %>%
+  #add_column(obs = 1:nrow(.), .before = "X") %>%
+  DT::datatable(
+    caption = paste0("基于箱组数的结果整合（N=1001）"),
+    options = list(dom = "tip", pageLength =10,
+                   scrollX = TRUE)) %>%
+  formatRound(c(2:3), digits = 2)  %>%
+  formatRound(c(11:13), digits = 4)
+```
+
+
+### 匹配样本数据和箱组（Nn=100100）
+
+考虑到每1个样本数据点，都会被不同的箱组所“套中”，因此我们现在匹配样本数据（`n=100`）到不同的箱组（`N=1001`）中去，最终得到了`Nn=100100`行的计算表。
+
+具体计算代码为：
+
+```{r}
+tbl_match <- tbl_result %>%
+  mutate(data = map(x,~dt)) %>%
+  unnest(data) %>%
+  mutate(
+    isbins = ifelse(
+      ((X>=x-h1)& (X<(x+h1))),
+      1, 0)
+  )  %>%
+  mutate(
+    k0=ifelse(
+      ((X>=lwr)& (X<upr)),
+      1, 0),
+    k1=as.numeric(as.vector(t(k1))),
+    k2 = as.vector(t(k2))
+    ) %>%
+  mutate(bd = as.character(bd))
+```
+
+
+```{r, echo=FALSE}
+tbl_match  %>%
+  head(1001) %>%
+  DT::datatable(
+    caption = paste0("匹配样本数据和箱组（Nn=100100）"),
+    options = list(dom = "tip", pageLength =10,
+                   scrollX = TRUE)) %>%
+  formatRound(c(2:3), digits = 2)  %>%
+  formatRound(c(11:13), digits = 4)  %>%
+  formatRound(c(15:16,20), digits = 4)
+```
+
+
+### 获得不同方法下的计算表格
+
+现在给出三种方法下的计算表：
+
+```{r}
+# binned mean
+tbl_m0 <- tbl_match %>%
+  filter(k0==1) %>%
+  select(index, X, Y, bd,lwr, upr,mid,k0,m0) %>%
+  unique() %>%
+  arrange(index) %>%
+  group_by(bd) %>%
+  mutate(sum_k = sum(k0),
+         sum_ky = sum(k0*Y)) %>%
+  ungroup() %>%
+  mutate(bins = bd) %>%
+  rename("x"="mid")
+
+# scrolling mean
+tbl_m1 <- tbl_match %>%
+  filter(k1==1) %>%
+  select(index, X, Y, bd,bins,lft, rgt,x,k1,m1) %>%
+  unique() %>%
+  arrange(lft,index) %>%
+  group_by(x) %>%
+  mutate(sum_k = sum(k1),
+         sum_ky = sum(k1*Y)) %>%
+  ungroup() %>%
+  rename("lwr"="lft", "upr"="rgt")
+
+# NW kernel mean
+tbl_m2 <- tbl_match %>%
+  #filter(k1==1) %>%
+  select(index, X, Y, bd,bins,lft, rgt,x,k2,m2) %>%
+  unique() %>%
+  arrange(lft,index) %>%
+  group_by(x) %>%
+  mutate(sum_k = sum(k2),
+         sum_ky = sum(k2*Y)) %>%
+  ungroup() %>%
+  rename("lwr"="lft", "upr"="rgt")
+
+```
+
+
+例如，我们这里展示**滚动箱组均值**估计的计算表：
+
+```{r, echo=FALSE}
+tbl_m1  %>%
+  head(1001) %>%
+  DT::datatable(
+    caption = paste0("滚动箱组均值估计的计算表（Nn=100100）"),
+    options = list(dom = "tip", pageLength =10,
+                   scrollX = TRUE)) %>%
+  formatRound(c(2:3), digits = 2)  %>%
+  formatRound(c(9:12), digits = 4) 
+```
+
+### 生成箱组区隔及相关计算表
+
+```{r}
+# help function
+gen_bins <- function(df){
+  out <- df %>% 
+    select(#index, X, Y,
+           x, bins,sum_ky, sum_k,
+           starts_with("m")) %>%
+    unique() %>%
+    arrange(x) %>%
+    mutate(x=number(x, 0.01))
+}
+
+bin1 <- gen_bins(tbl_m0)
+n1 <- nrow(bin1)
+
+bin2 <- gen_bins(tbl_m1)
+n2 <- nrow(bin2)
+
+bin3 <- gen_bins(tbl_m2)
+n3 <- nrow(bin3)
+```
+
+
+## 绘制分析图
+
+### 绘制底图
+
+```{r}
+#### draw plot ####
+
+# basic scatter plot
+fsize <- 16
+p0 <- ggplot() +
+  geom_point(aes(X, Y),data = dt, pch=21) +
+  labs(x= "自变量X", y ="因变量Y") +
+  scale_x_continuous(breaks = seq(0,10,1), limits = c(0,10)) +
+  scale_y_continuous(breaks = seq(-1,2,0.5), limits = c(-1,2)) +
+  theme_bw() +
+  theme(text = element_text(size = 16))
+
+### basic with bins
+p00 <- p0 +
+  geom_vline(xintercept = x0, lty="dashed") +
+  geom_point(aes(X, Y, color=as.factor(bd)),
+             data = tbl_m0, pch=21) +
+  geom_rect(aes(ymin=-1,ymax=2,
+                xmin= lwr, xmax = upr, 
+                fill = as.factor(bd)),
+            data = tbl_m0 %>% select(bd, lwr, upr) %>% unique,
+            alpha = 0.05, inherit.aes = FALSE) +
+  theme(legend.position = "none",
+        text = element_text(size = 16))
+
+### basic with means
+p000 <- p00 +
+  geom_point(aes(x, m0),
+             data = tbl_m0 %>% select(x, m0) %>% unique(), 
+             pch=15, color="black", size=3)
+
+```
+
+### 箱组均值估计图形
+
+```{r}
+### binned plot
+p1 <- p00 +
+  geom_point(aes(x, m0),
+             data = tbl_m0 %>% select(x, m0) %>% unique(), 
+             pch=15, color="black", size=3) +
+  geom_segment(aes(x =lwr, xend=upr,
+                   y =m0, yend = m0,
+                   color=as.factor(bd)),
+            data = tbl_m0 %>% select(lwr,bd,upr, m0) %>% unique(),
+            lty="solid", lwd=0.8) +
+  theme(legend.position = "none",
+        text = element_text(size = fsize))
+
+```
+
+### 滚动箱组均值估计图形
+
+```{r}
+## scrolling  plot
+
+p20 <- p0 +
+  geom_point(aes(x, m1, color=as.factor(bd)),
+             data = tbl_m1 %>% select(x,m1,bins,bd) %>% unique(),
+             pch=20) +
+  theme(legend.position = "none",
+        text = element_text(size = fsize))
+
+p2 <- p0 +
+  geom_point(aes(x, m0),
+             data = tbl_m0 %>% select(x, m0) %>% unique(), 
+             pch=15, color="black") +
+  geom_line(aes(x, m1, color=as.factor(bd)),
+            data = tbl_m1 %>% select(x,m1,bins,bd) %>% unique(), 
+            lty="solid", lwd=0.8) +
+  theme(legend.position = "none",
+        text = element_text(size = fsize))
+
+```
+
+
+### NW核均值估计图形
+
+```{r}
+## Nadaraya-Watson  plot
+p3 <- p0 +
+  geom_point(aes(x, m0),
+             data = tbl_m0 %>% select(x, m0) %>% unique(), 
+             pch=15, color="black") +
+  geom_line(aes(x, m2, color=as.factor(bd)),
+            data = tbl_m2 %>% select(x,m2,bins,bd) %>% unique(), 
+            lty="solid", lwd=0.8) +
+  theme(legend.position = "none",
+        text = element_text(size = fsize))
+
+
+```
+
+
+### 三种方法的图形
+
+```{r}
+## all three plot
+p_all <- p0 +
+  geom_vline(xintercept = x0, lty="dashed")  +
+  geom_point(aes(x, m0),
+             data = tbl_m0 %>% select(x, m0) %>% unique(), 
+             pch=15, size =3, color="black")  +
+  geom_segment(aes(x =lwr, xend=upr,
+                   y =m0, yend = m0,
+                   color= "binned"),
+               data = tbl_m0 %>% select(lwr,bd,upr, m0) %>% unique(),
+               lty="solid", lwd=0.8)  +
+  geom_line(aes(x, m1, color="rolling"),
+            data = tbl_m1 %>% select(x,m1) %>% unique(), 
+            lty="solid", lwd=0.8) +
+  geom_line(aes(x, m2, color = "NW"),
+            data = tbl_m2 %>% select(x,m2) %>% unique(), 
+            lty="solid", lwd=0.8) +
+  scale_color_manual(
+    name="mx",
+    breaks = c("binned", "rolling","NW"),
+    values=c("green", "red","blue"))+
+  theme(legend.position = "right",
+        text = element_text(size = fsize))
+```
+
+
+
+
+
+
+## 展示分析结果
+
+
+### 箱组均值估计结果
+
+
+利用箱组均值估计公式，我们可以计算得到不同箱组的均值估计：
+
+```{r}
+bin1 %>%
+  #select(x, bins, sum_KY, sum_K, mx) %>%
+  DT::datatable(options = list(dom = "t"))%>%
+  formatRound(c(1,3,5),c(0,4,4))
+```
+
+- 箱组内因变量观测值的求和`sum_ky`
+$=\sum_{i=1}^{n}  \mathbb{1}\left\{\left|X_{i}-x\right| \leq h\right\} \cdot Y_{i}$
+
+- 箱组的样本数`sum_k`
+$=\sum_{i=1}^{n}  \mathbb{1}\left\{\left|X_{i}-x\right| \leq h\right\}$
+
+- 箱组的均值估计`m0`
+$=\widehat{m}(x_j),j \in (1,2,\cdots,5)$
+
+
+
+- 首先我们展示的是5个箱组的划分：
+
+```{r}
+#| out.height = 450
+p00
+```
+
+
+> **说明**：a)垂直虚线表示箱组中心取值点
+$x_j$；b)不同矩形颜色区块表示不同箱组。
+
+
+
+- 根据箱组均值计算值，我们展示在散点图中：
+
+```{r}
+#| out.height = 450
+p000
+```
+
+
+
+- 简单地，可将**箱组均值**作为对这一箱组**条件期望函数**CEF的近似：
+
+```{r}
+#| out.height = 450
+p1
+```
+
+### 滚动箱组均值估计结果
+
+利用箱组均值估计公式，我们可以计算得到不同箱组的均值估计：
+
+
+```{r}
+bin2 %>%
+  DT::datatable(
+    options = list(dom = "tip",
+                   pageLength =5)) %>%
+  formatRound(c(3,5),c(4,4))
+  
+```
+
+
+- 箱组内因变量观测值的求和`sum_ky`
+$=\sum_{i=1}^{n}  \mathbb{1}\left\{\left|X_{i}-x\right| \leq h\right\} \cdot Y_{i}$
+
+- 箱组的样本数`sum_k`
+$=\sum_{i=1}^{n}  \mathbb{1}\left\{\left|X_{i}-x\right| \leq h\right\}$
+
+- 箱组的均值估计`m1`
+$=\widehat{m}(x_j),j \in (1,2,\cdots,1001)$
+
+
+- 根据箱组均值计算值，我们展示在散点图中：
+
+```{r}
+#| out.height = 450
+p20
+```
+
+
+- 同样地，可将**箱组均值**作为对这一箱组**条件期望函数**CEF的近似：
+
+```{r}
+#| out.height = 450
+p2
+```
+
+
+### NW核均值估计结果
+
+利用箱组均值核函数估计公式，我们可以计算得到不同箱组的均值估计：
+
+```{r}
+bin3 %>%
+  DT::datatable(
+    options = list(dom = "tip",
+                   pageLength =5)) %>%
+  formatRound(c(3:5),c(4))
+  
+```
+
+
+
+- 同样地，可将**箱组均值**作为对这一箱组**条件期望函数**CEF的近似：
+
+```{r}
+#| out.height = 450
+p3
+```
+
+
+### 三种方法估计对比
+
+```{r}
+#| out.height = 450
+p_all
+```
+
+- **NW核估计**方法相比**箱组均值估计**和**滚动箱组均值估计**要更加平滑。
+
+
+## 参考文献{-}
+
+<div id="refs"></div>

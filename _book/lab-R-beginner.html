@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Lab 1 R语言在计量经济的应用（新手启蒙） | 高级计量暑期研讨</title>
+  <meta name="description" content="高级计量经济学系列专题。" />
+  <meta name="generator" content="bookdown 0.22.2 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Lab 1 R语言在计量经济的应用（新手启蒙） | 高级计量暑期研讨" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="高级计量经济学系列专题。" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Lab 1 R语言在计量经济的应用（新手启蒙） | 高级计量暑期研讨" />
+  
+  <meta name="twitter:description" content="高级计量经济学系列专题。" />
+  
+
+<meta name="author" content="胡华平" />
+
+
+<meta name="date" content="2022-06-29" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="index.html"/>
+<link rel="next" href="lab-mean-est.html"/>
+<script src="libs/header-attrs/header-attrs.js"></script>
+<script src="libs/jquery/jquery.min.js"></script>
+<link href="libs/gitbook/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections/anchor-sections.js"></script>
+<script src="libs/htmlwidgets/htmlwidgets.js"></script>
+<link href="libs/datatables-css/datatables-crosstalk.css" rel="stylesheet" />
+<script src="libs/datatables-binding/datatables.js"></script>
+<link href="libs/dt-core/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="libs/dt-core/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="libs/dt-core/js/jquery.dataTables.min.js"></script>
+<link href="libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
+<script src="libs/crosstalk/js/crosstalk.min.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="css/text-box.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">高级计量暑期研讨</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>前言</a></li>
+<li class="chapter" data-level="1" data-path="lab-R-beginner.html"><a href="lab-R-beginner.html"><i class="fa fa-check"></i><b>1</b> R语言在计量经济的应用（新手启蒙）</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="lab-R-beginner.html"><a href="lab-R-beginner.html#open-source"><i class="fa fa-check"></i><b>1.1</b> 现代开源统计软件的趋势特点</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="lab-R-beginner.html"><a href="lab-R-beginner.html#封闭vs开源"><i class="fa fa-check"></i><b>1.1.1</b> 封闭VS开源</a></li>
+<li class="chapter" data-level="1.1.2" data-path="lab-R-beginner.html"><a href="lab-R-beginner.html#文学化编程"><i class="fa fa-check"></i><b>1.1.2</b> 文学化编程</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="lab-R-beginner.html"><a href="lab-R-beginner.html#the-useage"><i class="fa fa-check"></i><b>1.2</b> R在论文写作和项目协作中的应用</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="lab-R-beginner.html"><a href="lab-R-beginner.html#科技论文写作演示现场操作"><i class="fa fa-check"></i><b>1.2.1</b> 科技论文写作演示（现场操作）</a></li>
+<li class="chapter" data-level="1.2.2" data-path="lab-R-beginner.html"><a href="lab-R-beginner.html#科研项目写作演示现场操作"><i class="fa fa-check"></i><b>1.2.2</b> 科研项目写作演示（现场操作）</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="lab-R-beginner.html"><a href="lab-R-beginner.html#Rstudio-intro"><i class="fa fa-check"></i><b>1.3</b> R及Rstudio简介</a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="lab-R-beginner.html"><a href="lab-R-beginner.html#rstudio基本视窗"><i class="fa fa-check"></i><b>1.3.1</b> Rstudio基本视窗</a></li>
+<li class="chapter" data-level="1.3.2" data-path="lab-R-beginner.html"><a href="lab-R-beginner.html#项目文件结构"><i class="fa fa-check"></i><b>1.3.2</b> 项目文件结构</a></li>
+<li class="chapter" data-level="1.3.3" data-path="lab-R-beginner.html"><a href="lab-R-beginner.html#r包r-packages"><i class="fa fa-check"></i><b>1.3.3</b> R包（R packages）</a></li>
+<li class="chapter" data-level="1.3.4" data-path="lab-R-beginner.html"><a href="lab-R-beginner.html#r编程风格classic-r-vs-tidyvese-r"><i class="fa fa-check"></i><b>1.3.4</b> R编程风格：Classic R VS tidyvese R</a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="lab-R-beginner.html"><a href="lab-R-beginner.html#resources"><i class="fa fa-check"></i><b>1.4</b> 一些R学习资源</a>
+<ul>
+<li class="chapter" data-level="1.4.1" data-path="lab-R-beginner.html"><a href="lab-R-beginner.html#用r进行编程统计分析"><i class="fa fa-check"></i><b>1.4.1</b> 用R进行编程统计分析</a></li>
+<li class="chapter" data-level="1.4.2" data-path="lab-R-beginner.html"><a href="lab-R-beginner.html#用r进行绘图图形可视化"><i class="fa fa-check"></i><b>1.4.2</b> 用R进行绘图（图形可视化）</a></li>
+<li class="chapter" data-level="1.4.3" data-path="lab-R-beginner.html"><a href="lab-R-beginner.html#用r来写文章"><i class="fa fa-check"></i><b>1.4.3</b> 用R来写文章</a></li>
+<li class="chapter" data-level="1.4.4" data-path="lab-R-beginner.html"><a href="lab-R-beginner.html#project版本控制和团队协作"><i class="fa fa-check"></i><b>1.4.4</b> project版本控制和团队协作</a></li>
+</ul></li>
+<li class="chapter" data-level="1.5" data-path="lab-R-beginner.html"><a href="lab-R-beginner.html#recommends-AE"><i class="fa fa-check"></i><b>1.5</b> 关于计量经济学习的几点建议</a></li>
+<li class="chapter" data-level="1.6" data-path="lab-R-beginner.html"><a href="lab-R-beginner.html#recommends-coding"><i class="fa fa-check"></i><b>1.6</b> 关于编程语言的几点建议</a></li>
+<li class="chapter" data-level="" data-path="lab-R-beginner.html"><a href="lab-R-beginner.html#参考文献"><i class="fa fa-check"></i>参考文献</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="lab-mean-est.html"><a href="lab-mean-est.html"><i class="fa fa-check"></i><b>2</b> 均值估计（模拟数据）</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="lab-mean-est.html"><a href="lab-mean-est.html#实验说明"><i class="fa fa-check"></i><b>2.1</b> 实验说明</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="lab-mean-est.html"><a href="lab-mean-est.html#实验内容"><i class="fa fa-check"></i><b>2.1.1</b> 实验内容</a></li>
+<li class="chapter" data-level="2.1.2" data-path="lab-mean-est.html"><a href="lab-mean-est.html#材料准备"><i class="fa fa-check"></i><b>2.1.2</b> 材料准备</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="lab-mean-est.html"><a href="lab-mean-est.html#数据集描述"><i class="fa fa-check"></i><b>2.2</b> 数据集描述</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="lab-mean-est.html"><a href="lab-mean-est.html#数据呈现"><i class="fa fa-check"></i><b>2.2.1</b> 数据呈现</a></li>
+<li class="chapter" data-level="2.2.2" data-path="lab-mean-est.html"><a href="lab-mean-est.html#数据散点图"><i class="fa fa-check"></i><b>2.2.2</b> 数据散点图</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="lab-mean-est.html"><a href="lab-mean-est.html#均值估计"><i class="fa fa-check"></i><b>2.3</b> 均值估计</a></li>
+<li class="chapter" data-level="2.4" data-path="lab-mean-est.html"><a href="lab-mean-est.html#整合计算结果"><i class="fa fa-check"></i><b>2.4</b> 整合计算结果</a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="lab-mean-est.html"><a href="lab-mean-est.html#基于箱组数的结果整合n1001"><i class="fa fa-check"></i><b>2.4.1</b> 基于箱组数的结果整合（N=1001）</a></li>
+<li class="chapter" data-level="2.4.2" data-path="lab-mean-est.html"><a href="lab-mean-est.html#匹配样本数据和箱组nn100100"><i class="fa fa-check"></i><b>2.4.2</b> 匹配样本数据和箱组（Nn=100100）</a></li>
+<li class="chapter" data-level="2.4.3" data-path="lab-mean-est.html"><a href="lab-mean-est.html#获得不同方法下的计算表格"><i class="fa fa-check"></i><b>2.4.3</b> 获得不同方法下的计算表格</a></li>
+<li class="chapter" data-level="2.4.4" data-path="lab-mean-est.html"><a href="lab-mean-est.html#生成箱组区隔及相关计算表"><i class="fa fa-check"></i><b>2.4.4</b> 生成箱组区隔及相关计算表</a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="lab-mean-est.html"><a href="lab-mean-est.html#绘制分析图"><i class="fa fa-check"></i><b>2.5</b> 绘制分析图</a>
+<ul>
+<li class="chapter" data-level="2.5.1" data-path="lab-mean-est.html"><a href="lab-mean-est.html#绘制底图"><i class="fa fa-check"></i><b>2.5.1</b> 绘制底图</a></li>
+<li class="chapter" data-level="2.5.2" data-path="lab-mean-est.html"><a href="lab-mean-est.html#箱组均值估计图形"><i class="fa fa-check"></i><b>2.5.2</b> 箱组均值估计图形</a></li>
+<li class="chapter" data-level="2.5.3" data-path="lab-mean-est.html"><a href="lab-mean-est.html#滚动箱组均值估计图形"><i class="fa fa-check"></i><b>2.5.3</b> 滚动箱组均值估计图形</a></li>
+<li class="chapter" data-level="2.5.4" data-path="lab-mean-est.html"><a href="lab-mean-est.html#nw核均值估计图形"><i class="fa fa-check"></i><b>2.5.4</b> NW核均值估计图形</a></li>
+<li class="chapter" data-level="2.5.5" data-path="lab-mean-est.html"><a href="lab-mean-est.html#三种方法的图形"><i class="fa fa-check"></i><b>2.5.5</b> 三种方法的图形</a></li>
+</ul></li>
+<li class="chapter" data-level="2.6" data-path="lab-mean-est.html"><a href="lab-mean-est.html#展示分析结果"><i class="fa fa-check"></i><b>2.6</b> 展示分析结果</a>
+<ul>
+<li class="chapter" data-level="2.6.1" data-path="lab-mean-est.html"><a href="lab-mean-est.html#箱组均值估计结果"><i class="fa fa-check"></i><b>2.6.1</b> 箱组均值估计结果</a></li>
+<li class="chapter" data-level="2.6.2" data-path="lab-mean-est.html"><a href="lab-mean-est.html#滚动箱组均值估计结果"><i class="fa fa-check"></i><b>2.6.2</b> 滚动箱组均值估计结果</a></li>
+<li class="chapter" data-level="2.6.3" data-path="lab-mean-est.html"><a href="lab-mean-est.html#nw核均值估计结果"><i class="fa fa-check"></i><b>2.6.3</b> NW核均值估计结果</a></li>
+<li class="chapter" data-level="2.6.4" data-path="lab-mean-est.html"><a href="lab-mean-est.html#三种方法估计对比"><i class="fa fa-check"></i><b>2.6.4</b> 三种方法估计对比</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="lab-mean-est.html"><a href="lab-mean-est.html#参考文献-1"><i class="fa fa-check"></i>参考文献</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="lab-local-reg.html"><a href="lab-local-reg.html"><i class="fa fa-check"></i><b>3</b> 局部回归（模拟数据）</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="lab-local-reg.html"><a href="lab-local-reg.html#实验说明-1"><i class="fa fa-check"></i><b>3.1</b> 实验说明</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="lab-local-reg.html"><a href="lab-local-reg.html#实验内容-1"><i class="fa fa-check"></i><b>3.1.1</b> 实验内容</a></li>
+<li class="chapter" data-level="3.1.2" data-path="lab-local-reg.html"><a href="lab-local-reg.html#材料准备-1"><i class="fa fa-check"></i><b>3.1.2</b> 材料准备</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="lab-local-reg.html"><a href="lab-local-reg.html#数据集描述-1"><i class="fa fa-check"></i><b>3.2</b> 数据集描述</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="lab-local-reg.html"><a href="lab-local-reg.html#数据呈现-1"><i class="fa fa-check"></i><b>3.2.1</b> 数据呈现</a></li>
+<li class="chapter" data-level="3.2.2" data-path="lab-local-reg.html"><a href="lab-local-reg.html#数据散点图-1"><i class="fa fa-check"></i><b>3.2.2</b> 数据散点图</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="lab-local-reg.html"><a href="lab-local-reg.html#局部回归估计过程"><i class="fa fa-check"></i><b>3.3</b> 局部回归估计过程</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="lab-local-reg.html"><a href="lab-local-reg.html#基本原理"><i class="fa fa-check"></i><b>3.3.1</b> 基本原理</a></li>
+<li class="chapter" data-level="3.3.2" data-path="lab-local-reg.html"><a href="lab-local-reg.html#局部回归计算"><i class="fa fa-check"></i><b>3.3.2</b> 局部回归计算</a>
+<ul>
+<li class="chapter" data-level="3.3.2.1" data-path="lab-local-reg.html"><a href="lab-local-reg.html#对于局部滚动回归和局部线性回归"><i class="fa fa-check"></i><b>3.3.2.1</b> 对于局部滚动回归和局部线性回归</a></li>
+<li class="chapter" data-level="3.3.2.2" data-path="lab-local-reg.html"><a href="lab-local-reg.html#对于局部箱组回归"><i class="fa fa-check"></i><b>3.3.2.2</b> 对于局部箱组回归</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="lab-local-reg.html"><a href="lab-local-reg.html#整合计算结果-1"><i class="fa fa-check"></i><b>3.4</b> 整合计算结果</a>
+<ul>
+<li class="chapter" data-level="3.4.1" data-path="lab-local-reg.html"><a href="lab-local-reg.html#基于箱组数的结果整合n1001-1"><i class="fa fa-check"></i><b>3.4.1</b> 基于箱组数的结果整合（N=1001）</a></li>
+<li class="chapter" data-level="3.4.2" data-path="lab-local-reg.html"><a href="lab-local-reg.html#匹配样本数据和箱组nn100100-1"><i class="fa fa-check"></i><b>3.4.2</b> 匹配样本数据和箱组（Nn=100100）</a></li>
+<li class="chapter" data-level="3.4.3" data-path="lab-local-reg.html"><a href="lab-local-reg.html#获得不同方法下的计算表格-1"><i class="fa fa-check"></i><b>3.4.3</b> 获得不同方法下的计算表格</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="lab-local-reg.html"><a href="lab-local-reg.html#绘制分析图-1"><i class="fa fa-check"></i><b>3.5</b> 绘制分析图</a>
+<ul>
+<li class="chapter" data-level="3.5.1" data-path="lab-local-reg.html"><a href="lab-local-reg.html#绘制底图-1"><i class="fa fa-check"></i><b>3.5.1</b> 绘制底图</a></li>
+<li class="chapter" data-level="3.5.2" data-path="lab-local-reg.html"><a href="lab-local-reg.html#箱组回归估计图形"><i class="fa fa-check"></i><b>3.5.2</b> 箱组回归估计图形</a></li>
+<li class="chapter" data-level="3.5.3" data-path="lab-local-reg.html"><a href="lab-local-reg.html#滚动箱组回归估计图形"><i class="fa fa-check"></i><b>3.5.3</b> 滚动箱组回归估计图形</a></li>
+<li class="chapter" data-level="3.5.4" data-path="lab-local-reg.html"><a href="lab-local-reg.html#局部线性核回归估计图形"><i class="fa fa-check"></i><b>3.5.4</b> 局部线性核回归估计图形</a></li>
+<li class="chapter" data-level="3.5.5" data-path="lab-local-reg.html"><a href="lab-local-reg.html#三种方法的图形-1"><i class="fa fa-check"></i><b>3.5.5</b> 三种方法的图形</a></li>
+</ul></li>
+<li class="chapter" data-level="3.6" data-path="lab-local-reg.html"><a href="lab-local-reg.html#展示分析结果-1"><i class="fa fa-check"></i><b>3.6</b> 展示分析结果</a>
+<ul>
+<li class="chapter" data-level="3.6.1" data-path="lab-local-reg.html"><a href="lab-local-reg.html#箱组局部回归估计结果"><i class="fa fa-check"></i><b>3.6.1</b> 箱组局部回归估计结果</a></li>
+<li class="chapter" data-level="3.6.2" data-path="lab-local-reg.html"><a href="lab-local-reg.html#滚动箱组局部回归估计结果"><i class="fa fa-check"></i><b>3.6.2</b> 滚动箱组局部回归估计结果</a></li>
+<li class="chapter" data-level="3.6.3" data-path="lab-local-reg.html"><a href="lab-local-reg.html#局部线性回归估计结果"><i class="fa fa-check"></i><b>3.6.3</b> 局部线性回归估计结果</a></li>
+<li class="chapter" data-level="3.6.4" data-path="lab-local-reg.html"><a href="lab-local-reg.html#三种方法估计对比-1"><i class="fa fa-check"></i><b>3.6.4</b> 三种方法估计对比</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="lab-local-reg.html"><a href="lab-local-reg.html#参考文献-2"><i class="fa fa-check"></i>参考文献</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html"><i class="fa fa-check"></i><b>4</b> 局部线性估计及效率分析（工资案例）</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#实验说明-2"><i class="fa fa-check"></i><b>4.1</b> 实验说明</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#实验内容-2"><i class="fa fa-check"></i><b>4.1.1</b> 实验内容</a></li>
+<li class="chapter" data-level="4.1.2" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#材料准备-2"><i class="fa fa-check"></i><b>4.1.2</b> 材料准备</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#案例描述"><i class="fa fa-check"></i><b>4.2</b> 案例描述</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#工资案例背景说明"><i class="fa fa-check"></i><b>4.2.1</b> 工资案例：背景说明</a></li>
+<li class="chapter" data-level="4.2.2" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#读取案例数据"><i class="fa fa-check"></i><b>4.2.2</b> 读取案例数据</a></li>
+<li class="chapter" data-level="4.2.3" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#数据呈现-2"><i class="fa fa-check"></i><b>4.2.3</b> 数据呈现</a></li>
+<li class="chapter" data-level="4.2.4" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#数据散点图-2"><i class="fa fa-check"></i><b>4.2.4</b> 数据散点图</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#过程1cef估计的经验参考谱宽选择"><i class="fa fa-check"></i><b>4.3</b> 过程1：CEF估计的经验参考谱宽选择</a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#r运算代码"><i class="fa fa-check"></i><b>4.3.1</b> R运算代码</a></li>
+<li class="chapter" data-level="4.3.2" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#过程步骤解读"><i class="fa fa-check"></i><b>4.3.2</b> 过程步骤解读</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#过程2cef估计的最优交叉验证谱宽选择"><i class="fa fa-check"></i><b>4.4</b> 过程2：CEF估计的最优交叉验证谱宽选择</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#r运算代码-1"><i class="fa fa-check"></i><b>4.4.1</b> R运算代码</a></li>
+<li class="chapter" data-level="4.4.2" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#过程步骤解读-1"><i class="fa fa-check"></i><b>4.4.2</b> 过程步骤解读</a></li>
+<li class="chapter" data-level="4.4.3" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#图形展示选择结果"><i class="fa fa-check"></i><b>4.4.3</b> 图形展示选择结果</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#过程3基于不同谱宽选择的cef估计"><i class="fa fa-check"></i><b>4.5</b> 过程3：基于不同谱宽选择的CEF估计</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#r运算代码-2"><i class="fa fa-check"></i><b>4.5.1</b> R运算代码</a></li>
+<li class="chapter" data-level="4.5.2" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#过程步骤解读-2"><i class="fa fa-check"></i><b>4.5.2</b> 过程步骤解读</a></li>
+<li class="chapter" data-level="4.5.3" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#图形展示估计结果"><i class="fa fa-check"></i><b>4.5.3</b> 图形展示估计结果</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#过程4计算非参数估计的预测误差"><i class="fa fa-check"></i><b>4.6</b> 过程4：计算非参数估计的预测误差</a>
+<ul>
+<li class="chapter" data-level="4.6.1" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#r运算代码-3"><i class="fa fa-check"></i><b>4.6.1</b> R运算代码</a></li>
+<li class="chapter" data-level="4.6.2" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#过程步骤解读-3"><i class="fa fa-check"></i><b>4.6.2</b> 过程步骤解读</a></li>
+</ul></li>
+<li class="chapter" data-level="4.7" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#过程5计算条件方差估计时的参考谱宽"><i class="fa fa-check"></i><b>4.7</b> 过程5：计算条件方差估计时的参考谱宽</a>
+<ul>
+<li class="chapter" data-level="4.7.1" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#r运算代码-4"><i class="fa fa-check"></i><b>4.7.1</b> R运算代码</a></li>
+<li class="chapter" data-level="4.7.2" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#过程步骤解读-4"><i class="fa fa-check"></i><b>4.7.2</b> 过程步骤解读</a></li>
+</ul></li>
+<li class="chapter" data-level="4.8" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#过程6计算条件方差估计时的最优交叉验证谱宽"><i class="fa fa-check"></i><b>4.8</b> 过程6：计算条件方差估计时的最优交叉验证谱宽</a>
+<ul>
+<li class="chapter" data-level="4.8.1" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#r运算代码-5"><i class="fa fa-check"></i><b>4.8.1</b> R运算代码</a></li>
+<li class="chapter" data-level="4.8.2" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#过程步骤解读-5"><i class="fa fa-check"></i><b>4.8.2</b> 过程步骤解读</a></li>
+<li class="chapter" data-level="4.8.3" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#图形展示谱宽选择结果"><i class="fa fa-check"></i><b>4.8.3</b> 图形展示谱宽选择结果</a></li>
+</ul></li>
+<li class="chapter" data-level="4.9" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#过程7计算cef估计的方差和标准差"><i class="fa fa-check"></i><b>4.9</b> 过程7：计算CEF估计的方差和标准差</a>
+<ul>
+<li class="chapter" data-level="4.9.1" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#r运算代码-6"><i class="fa fa-check"></i><b>4.9.1</b> R运算代码</a></li>
+<li class="chapter" data-level="4.9.2" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#过程步骤解读-6"><i class="fa fa-check"></i><b>4.9.2</b> 过程步骤解读</a></li>
+<li class="chapter" data-level="4.9.3" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#图形展示置信带"><i class="fa fa-check"></i><b>4.9.3</b> 图形展示置信带</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="lab-LL-wage.html"><a href="lab-LL-wage.html#参考文献-3"><i class="fa fa-check"></i>参考文献</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html"><i class="fa fa-check"></i><b>5</b> 无协变量的SRDD效应分析（儿童死亡率案例）</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#实验说明-3"><i class="fa fa-check"></i><b>5.1</b> 实验说明</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#实验内容-3"><i class="fa fa-check"></i><b>5.1.1</b> 实验内容</a></li>
+<li class="chapter" data-level="5.1.2" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#材料准备-3"><i class="fa fa-check"></i><b>5.1.2</b> 材料准备</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#案例描述-1"><i class="fa fa-check"></i><b>5.2</b> 案例描述</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#死亡率案例背景说明"><i class="fa fa-check"></i><b>5.2.1</b> 死亡率案例：背景说明</a></li>
+<li class="chapter" data-level="5.2.2" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#读取案例数据-1"><i class="fa fa-check"></i><b>5.2.2</b> 读取案例数据</a></li>
+<li class="chapter" data-level="5.2.3" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#数据呈现-3"><i class="fa fa-check"></i><b>5.2.3</b> 数据呈现</a></li>
+<li class="chapter" data-level="5.2.4" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#数据分组描述性统计"><i class="fa fa-check"></i><b>5.2.4</b> 数据分组描述性统计</a></li>
+<li class="chapter" data-level="5.2.5" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#数据散点图-3"><i class="fa fa-check"></i><b>5.2.5</b> 数据散点图</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#过程1设定相关参数和辅助计算工具"><i class="fa fa-check"></i><b>5.3</b> 过程1：设定相关参数和辅助计算工具</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#r运算代码-7"><i class="fa fa-check"></i><b>5.3.1</b> R运算代码</a></li>
+<li class="chapter" data-level="5.3.2" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#过程步骤解读-7"><i class="fa fa-check"></i><b>5.3.2</b> 过程步骤解读</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#过程2进行rdd估计运算r代码"><i class="fa fa-check"></i><b>5.4</b> 过程2：进行RDD估计运算（R代码）</a></li>
+<li class="chapter" data-level="5.5" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#过程3将rdd估计结果整理成相关表格"><i class="fa fa-check"></i><b>5.5</b> 过程3：将RDD估计结果整理成相关表格</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#将断点两侧的mx估计结果整理成表格r代码"><i class="fa fa-check"></i><b>5.5.1</b> 将断点两侧的m(x)估计结果整理成表格（R代码）</a></li>
+<li class="chapter" data-level="5.5.2" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#将最终rdd断点效应整理成表格r代码"><i class="fa fa-check"></i><b>5.5.2</b> 将最终RDD断点效应整理成表格（R代码）</a></li>
+</ul></li>
+<li class="chapter" data-level="5.6" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#过程4绘制rdd分析图mx估计值"><i class="fa fa-check"></i><b>5.6</b> 过程4：绘制RDD分析图（mx估计值）</a>
+<ul>
+<li class="chapter" data-level="5.6.1" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#对绘制底图r代码"><i class="fa fa-check"></i><b>5.6.1</b> 对绘制底图（R代码）</a></li>
+<li class="chapter" data-level="5.6.2" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#对断点左边绘制mx估计图r代码"><i class="fa fa-check"></i><b>5.6.2</b> 对断点左边绘制mx估计图（R代码）</a></li>
+<li class="chapter" data-level="5.6.3" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#对断点右边绘制mx估计图r代码"><i class="fa fa-check"></i><b>5.6.3</b> 对断点右边绘制mx估计图（R代码）</a></li>
+<li class="chapter" data-level="5.6.4" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#同时对断点两边绘制mx估计图r代码"><i class="fa fa-check"></i><b>5.6.4</b> 同时对断点两边绘制mx估计图（R代码）</a></li>
+</ul></li>
+<li class="chapter" data-level="5.7" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#过程5绘制rdd置信带图"><i class="fa fa-check"></i><b>5.7</b> 过程5：绘制RDD置信带图</a>
+<ul>
+<li class="chapter" data-level="5.7.1" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#对断点左边绘制置信带r代码"><i class="fa fa-check"></i><b>5.7.1</b> 对断点左边绘制置信带（R代码）</a></li>
+<li class="chapter" data-level="5.7.2" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#对断点右边绘制置信带r代码"><i class="fa fa-check"></i><b>5.7.2</b> 对断点右边绘制置信带（R代码）</a></li>
+<li class="chapter" data-level="5.7.3" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#对断点两边同时绘制置信带r代码"><i class="fa fa-check"></i><b>5.7.3</b> 对断点两边同时绘制置信带（R代码）</a></li>
+<li class="chapter" data-level="5.7.4" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#额外辅助绘图函数r代码"><i class="fa fa-check"></i><b>5.7.4</b> 额外辅助绘图函数（R代码）</a></li>
+</ul></li>
+<li class="chapter" data-level="5.8" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#rdd分析的过程步骤解读"><i class="fa fa-check"></i><b>5.8</b> RDD分析的过程步骤解读</a>
+<ul>
+<li class="chapter" data-level="5.8.1" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#条件期望函数cef-mx的llr估计结果"><i class="fa fa-check"></i><b>5.8.1</b> 条件期望函数CEF m(x)的LLR估计结果</a></li>
+<li class="chapter" data-level="5.8.2" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#条件期望函数cef-mx的方差和标准差估计结果"><i class="fa fa-check"></i><b>5.8.2</b> 条件期望函数CEF m(x)的方差和标准差估计结果</a></li>
+<li class="chapter" data-level="5.8.3" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#条件期望函数cef-mx的置信区间和置信带"><i class="fa fa-check"></i><b>5.8.3</b> 条件期望函数CEF m(x)的置信区间和置信带</a></li>
+<li class="chapter" data-level="5.8.4" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#rdd断点处置效应计算结果"><i class="fa fa-check"></i><b>5.8.4</b> RDD断点处置效应计算结果</a></li>
+<li class="chapter" data-level="5.8.5" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#rdd断点处置效应的估计误差及显著性检验"><i class="fa fa-check"></i><b>5.8.5</b> RDD断点处置效应的估计误差及显著性检验</a></li>
+</ul></li>
+<li class="chapter" data-level="5.9" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#过程6等价线性回归"><i class="fa fa-check"></i><b>5.9</b> 过程6：等价线性回归</a>
+<ul>
+<li class="chapter" data-level="5.9.1" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#基本原理调整运行变量范围"><i class="fa fa-check"></i><b>5.9.1</b> 基本原理：调整运行变量范围</a></li>
+<li class="chapter" data-level="5.9.2" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#r运算代码-8"><i class="fa fa-check"></i><b>5.9.2</b> R运算代码</a></li>
+<li class="chapter" data-level="5.9.3" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#过程步骤解读-8"><i class="fa fa-check"></i><b>5.9.3</b> 过程步骤解读</a>
+<ul>
+<li class="chapter" data-level="5.9.3.1" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#等价线性回归调整后的数据集"><i class="fa fa-check"></i><b>5.9.3.1</b> 等价线性回归：调整后的数据集</a></li>
+<li class="chapter" data-level="5.9.3.2" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#等价线性回归分组描述性统计"><i class="fa fa-check"></i><b>5.9.3.2</b> 等价线性回归：分组描述性统计</a></li>
+<li class="chapter" data-level="5.9.3.3" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#等价线性回归ols估计结果"><i class="fa fa-check"></i><b>5.9.3.3</b> 等价线性回归：OLS估计结果</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="lab-srdd-nocovs.html"><a href="lab-srdd-nocovs.html#参考文献-4"><i class="fa fa-check"></i>参考文献</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html"><i class="fa fa-check"></i><b>6</b> 引入协变量的RDD效应分析（儿童死亡率案例）</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#实验说明-4"><i class="fa fa-check"></i><b>6.1</b> 实验说明</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#实验内容-4"><i class="fa fa-check"></i><b>6.1.1</b> 实验内容</a></li>
+<li class="chapter" data-level="6.1.2" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#材料准备-4"><i class="fa fa-check"></i><b>6.1.2</b> 材料准备</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#案例描述-2"><i class="fa fa-check"></i><b>6.2</b> 案例描述</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#死亡率案例续背景说明"><i class="fa fa-check"></i><b>6.2.1</b> 死亡率案例（续）：背景说明</a></li>
+<li class="chapter" data-level="6.2.2" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#读取案例数据-2"><i class="fa fa-check"></i><b>6.2.2</b> 读取案例数据</a></li>
+<li class="chapter" data-level="6.2.3" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#数据呈现-4"><i class="fa fa-check"></i><b>6.2.3</b> 数据呈现</a></li>
+<li class="chapter" data-level="6.2.4" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#数据分组描述性统计-1"><i class="fa fa-check"></i><b>6.2.4</b> 数据分组描述性统计</a></li>
+<li class="chapter" data-level="6.2.5" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#数据散点图-4"><i class="fa fa-check"></i><b>6.2.5</b> 数据散点图</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#过程0设定相关参数和辅助计算工具"><i class="fa fa-check"></i><b>6.3</b> 过程0：设定相关参数和辅助计算工具</a>
+<ul>
+<li class="chapter" data-level="6.3.1" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#r运算代码-9"><i class="fa fa-check"></i><b>6.3.1</b> R运算代码</a></li>
+<li class="chapter" data-level="6.3.2" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#过程步骤解读协变量rdd分析的规则策略"><i class="fa fa-check"></i><b>6.3.2</b> 过程步骤解读：协变量RDD分析的规则策略</a></li>
+</ul></li>
+<li class="chapter" data-level="6.4" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#过程2协变量srdd估计"><i class="fa fa-check"></i><b>6.4</b> 过程2：协变量SRDD估计</a></li>
+<li class="chapter" data-level="6.5" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#过程3将rdd估计结果整理成相关表格-1"><i class="fa fa-check"></i><b>6.5</b> 过程3：将RDD估计结果整理成相关表格</a>
+<ul>
+<li class="chapter" data-level="6.5.1" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#将断点两侧的mx估计结果整理成表格r代码-1"><i class="fa fa-check"></i><b>6.5.1</b> 将断点两侧的m(x)估计结果整理成表格（R代码）</a></li>
+<li class="chapter" data-level="6.5.2" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#将rdd预测误差整理成表格r代码"><i class="fa fa-check"></i><b>6.5.2</b> 将RDD预测误差整理成表格（R代码）</a></li>
+<li class="chapter" data-level="6.5.3" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#将最终rdd断点效应整理成表格r代码-1"><i class="fa fa-check"></i><b>6.5.3</b> 将最终RDD断点效应整理成表格（R代码）</a></li>
+</ul></li>
+<li class="chapter" data-level="6.6" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#过程4绘制rdd分析图mx估计值-1"><i class="fa fa-check"></i><b>6.6</b> 过程4：绘制RDD分析图（mx估计值）</a>
+<ul>
+<li class="chapter" data-level="6.6.1" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#对绘制底图r代码-1"><i class="fa fa-check"></i><b>6.6.1</b> 对绘制底图（R代码）</a></li>
+<li class="chapter" data-level="6.6.2" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#对断点左边绘制mx估计图r代码-1"><i class="fa fa-check"></i><b>6.6.2</b> 对断点左边绘制mx估计图（R代码）</a></li>
+<li class="chapter" data-level="6.6.3" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#对断点右边绘制mx估计图r代码-1"><i class="fa fa-check"></i><b>6.6.3</b> 对断点右边绘制mx估计图（R代码）</a></li>
+<li class="chapter" data-level="6.6.4" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#同时对断点两边绘制mx估计图r代码-1"><i class="fa fa-check"></i><b>6.6.4</b> 同时对断点两边绘制mx估计图（R代码）</a></li>
+</ul></li>
+<li class="chapter" data-level="6.7" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#过程5绘制rdd置信带图-1"><i class="fa fa-check"></i><b>6.7</b> 过程5：绘制RDD置信带图</a>
+<ul>
+<li class="chapter" data-level="6.7.1" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#对断点左边绘制置信带r代码-1"><i class="fa fa-check"></i><b>6.7.1</b> 对断点左边绘制置信带（R代码）</a></li>
+<li class="chapter" data-level="6.7.2" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#对断点右边绘制置信带r代码-1"><i class="fa fa-check"></i><b>6.7.2</b> 对断点右边绘制置信带（R代码）</a></li>
+<li class="chapter" data-level="6.7.3" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#对断点两边同时绘制置信带r代码-1"><i class="fa fa-check"></i><b>6.7.3</b> 对断点两边同时绘制置信带（R代码）</a></li>
+</ul></li>
+<li class="chapter" data-level="6.8" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#协变量rdd分析的过程步骤解读"><i class="fa fa-check"></i><b>6.8</b> 协变量RDD分析的过程步骤解读</a>
+<ul>
+<li class="chapter" data-level="6.8.1" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#第1阶段llr估计残差"><i class="fa fa-check"></i><b>6.8.1</b> 第1阶段LLR估计残差</a></li>
+<li class="chapter" data-level="6.8.2" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#第2阶段llr估计残差"><i class="fa fa-check"></i><b>6.8.2</b> 第2阶段LLR估计残差</a></li>
+<li class="chapter" data-level="6.8.3" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#第3阶段ols估计模型"><i class="fa fa-check"></i><b>6.8.3</b> 第3阶段OLS估计(模型)</a></li>
+<li class="chapter" data-level="6.8.4" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#第3阶段ols估计结果"><i class="fa fa-check"></i><b>6.8.4</b> 第3阶段OLS估计（结果）</a></li>
+<li class="chapter" data-level="6.8.5" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#第4阶段构造残差"><i class="fa fa-check"></i><b>6.8.5</b> 第4阶段构造残差</a></li>
+<li class="chapter" data-level="6.8.6" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#条件期望函数cef-mx的llr估计结果-1"><i class="fa fa-check"></i><b>6.8.6</b> 条件期望函数CEF m(x)的LLR估计结果</a></li>
+<li class="chapter" data-level="6.8.7" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#条件期望函数cef-mx的标准差和置信区间"><i class="fa fa-check"></i><b>6.8.7</b> 条件期望函数CEF m(x)的标准差和置信区间</a></li>
+<li class="chapter" data-level="6.8.8" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#rdd断点处置效应计算结果-1"><i class="fa fa-check"></i><b>6.8.8</b> RDD断点处置效应计算结果</a></li>
+<li class="chapter" data-level="6.8.9" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#rdd断点处置效应的估计误差及显著性检验-1"><i class="fa fa-check"></i><b>6.8.9</b> RDD断点处置效应的估计误差及显著性检验</a></li>
+</ul></li>
+<li class="chapter" data-level="6.9" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#过程6无协变量srdd和有协变量srdd的比较"><i class="fa fa-check"></i><b>6.9</b> 过程6：无协变量SRDD和有协变量SRDD的比较</a>
+<ul>
+<li class="chapter" data-level="6.9.1" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#r运算代码-10"><i class="fa fa-check"></i><b>6.9.1</b> R运算代码</a></li>
+<li class="chapter" data-level="6.9.2" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#过程步骤解读1系数和标准误比较"><i class="fa fa-check"></i><b>6.9.2</b> 过程步骤解读1：系数和标准误比较</a></li>
+<li class="chapter" data-level="6.9.3" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#过程步骤解读2cef估计值图形比较"><i class="fa fa-check"></i><b>6.9.3</b> 过程步骤解读2：CEF估计值图形比较</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="lab-srdd-withcovs.html"><a href="lab-srdd-withcovs.html#参考文献-5"><i class="fa fa-check"></i>参考文献</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="appendix.html"><a href="appendix.html"><i class="fa fa-check"></i><b>7</b> 附录</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="appendix.html"><a href="appendix.html#command-stata"><i class="fa fa-check"></i><b>7.1</b> 常用stata命令</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="appendix.html"><a href="appendix.html#数列操作"><i class="fa fa-check"></i><b>7.1.1</b> 数列操作</a></li>
+<li class="chapter" data-level="7.1.2" data-path="appendix.html"><a href="appendix.html#时期操作"><i class="fa fa-check"></i><b>7.1.2</b> 时期操作</a></li>
+<li class="chapter" data-level="7.1.3" data-path="appendix.html"><a href="appendix.html#条件下回归"><i class="fa fa-check"></i><b>7.1.3</b> 条件下回归</a></li>
+</ul></li>
+</ul></li>
+<li class="divider"></li>
+<li><a 本书版权所有@胡华平</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">高级计量暑期研讨</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="lab-R-beginner" class="section level1" number="1">
+<h1><span class="header-section-number">Lab 1</span> R语言在计量经济的应用（新手启蒙）</h1>
+<p>在这个部分，我将就如下一些话题做一些介绍，并会进行现场操作展示。</p>
+<div id="open-source" class="section level2" number="1.1">
+<h2><span class="header-section-number">1.1</span> 现代开源统计软件的趋势特点</h2>
+<div id="封闭vs开源" class="section level3" number="1.1.1">
+<h3><span class="header-section-number">1.1.1</span> 封闭VS开源</h3>
+</div>
+<div id="文学化编程" class="section level3" number="1.1.2">
+<h3><span class="header-section-number">1.1.2</span> 文学化编程</h3>
+</div>
+</div>
+<div id="the-useage" class="section level2" number="1.2">
+<h2><span class="header-section-number">1.2</span> R在论文写作和项目协作中的应用</h2>
+<p>参看我的在线书稿：<a href="https://rworld.huhuaping.com/"><strong>R漂流记</strong></a>，尤其是<a href="https://rworld.huhuaping.com/research-assistant.html"><strong>第8章学术助手</strong></a>。</p>
+<div id="科技论文写作演示现场操作" class="section level3" number="1.2.1">
+<h3><span class="header-section-number">1.2.1</span> 科技论文写作演示（现场操作）</h3>
+</div>
+<div id="科研项目写作演示现场操作" class="section level3" number="1.2.2">
+<h3><span class="header-section-number">1.2.2</span> 科研项目写作演示（现场操作）</h3>
+</div>
+</div>
+<div id="Rstudio-intro" class="section level2" number="1.3">
+<h2><span class="header-section-number">1.3</span> R及Rstudio简介</h2>
+<div id="rstudio基本视窗" class="section level3" number="1.3.1">
+<h3><span class="header-section-number">1.3.1</span> Rstudio基本视窗</h3>
+<p>安装R软件和第三方编译软件Rstudio</p>
+<p>（开源软件，免费公开，自行安装）</p>
+<ul>
+<li><p><code>R CRAN</code>主站下载安装R程序(根据自己的电脑操作系统选择)。<a href="https://cran.r-project.org/">网址<code>https://cran.r-project.org/</code></a></p></li>
+<li><p><code>Rstudio</code>主站下载安装Rstudio软件。<a href="https://www.rstudio.com/">网址<code>https://www.rstudio.com/</code></a></p></li>
+</ul>
+</div>
+<div id="项目文件结构" class="section level3" number="1.3.2">
+<h3><span class="header-section-number">1.3.2</span> 项目文件结构</h3>
+</div>
+<div id="r包r-packages" class="section level3" number="1.3.3">
+<h3><span class="header-section-number">1.3.3</span> R包（R packages）</h3>
+</div>
+<div id="r编程风格classic-r-vs-tidyvese-r" class="section level3" number="1.3.4">
+<h3><span class="header-section-number">1.3.4</span> R编程风格：Classic R VS tidyvese R</h3>
+</div>
+</div>
+<div id="resources" class="section level2" number="1.4">
+<h2><span class="header-section-number">1.4</span> 一些R学习资源</h2>
+<p>R语言及Rmarkdown语言快速上手参考资料 。</p>
+<p><strong>说明</strong>：</p>
+<p>本文档中提到的图书pdf文件可以通过百度云下载（<a href="https://pan.baidu.com/s/1ZRuVSf2Jv_u3C_XmAUingA">下载地址</a>：<code>https://pan.baidu.com/s/1ZRuVSf2Jv_u3C_XmAUingA</code>）。</p>
+<p>下载地址永久有效！如有问题请反馈<code>wsad2008@gmail.com</code>。</p>
+<p>材料仅供学习交流使用，请尊重原作者的版权！祝大家开心学习，学有所成！</p>
+<div id="用r进行编程统计分析" class="section level3" number="1.4.1">
+<h3><span class="header-section-number">1.4.1</span> 用R进行编程统计分析</h3>
+<ul>
+<li><p>Adler, J. R in a Nutshell (2ed) [M], Reilly, 2012.这是R语言学习的红宝书之一，手中常备，随时翻阅。建议要通览一遍，并对照实例运行代码。</p></li>
+<li><p>Crawley, M. J. The R Book (2nd) [M], Wiley, 2013. 这是R语言学习的红宝书之二。两本红宝书写作风格不同，自己挑一本就行。</p></li>
+<li><p>Wickham, H. and G. Grolemund. R for Data Science: Import, Tidy, Transform, Visualize, and Model Data [M], O’Reilly Media, 2017. 这是Hadley大神的一大力作。这是进入R语言统计功力快速升级的超级秘笈！它让你能很快找到指哪打哪的酣畅淋漓！你会因为它更加热爱R！建议在红宝书之后务必要好好学习这本秘籍！</p></li>
+<li><p>Hadley, W. Advanced R [M], CRC Press, 2015.（高级进阶学习，更深入地认识R语言的基本奥义。建议后续学习。简单说，要成为R高手，就应该参透R语言的内部逻辑和底层架构！）</p></li>
+</ul>
+</div>
+<div id="用r进行绘图图形可视化" class="section level3" number="1.4.2">
+<h3><span class="header-section-number">1.4.2</span> 用R进行绘图（图形可视化）</h3>
+<ul>
+<li>Hadley, W. ggplot2: Elegant Graphics for Data Analysis [M], Springer, 2016. 没错，这又是Hadley大神出品。R可视化绘图ggplot2的创造者。说实话，他的文笔简练精准，毫不拖泥带水。真的把ggplot2绘图思想说得一清二楚！让你的R可视化技能瞬间提升N级。</li>
+</ul>
+</div>
+<div id="用r来写文章" class="section level3" number="1.4.3">
+<h3><span class="header-section-number">1.4.3</span> 用R来写文章</h3>
+<p>Rmarkdown语言与谢益辉大神：</p>
+<ul>
+<li><p>关注一个<a href="https://bookdown.org/">bookdown网站https://bookdown.org/</a>。里面都是用Rmarkdown写的书，免费下载，书籍内容作者还会不断更新！改变了出版行业！下面几本书都可以在线阅读和下载！！（神奇吧！）</p></li>
+<li><p>Xie, Y. Dynamic Documents with R and knitr [M], Chapman &amp; Hall/CRC, 2015. 谢大神的一本书，基本让你明白为什么可以抛弃word、ppt……</p></li>
+<li><p>Xie, Y. bookdown: Authoring Books and Technical Documents with R Markdown [M], Chapman &amp; Hall _ CRC 2016. 谢大神的又一本书，他开发的bookdown包，让你真正的可以抛弃word、ppt……</p></li>
+<li><p>yihui, X. R Markdown: The Definitive Guide [M]2018. 谢大神的新作，你可以完全掌握Rmarkdown了。</p></li>
+</ul>
+</div>
+<div id="project版本控制和团队协作" class="section level3" number="1.4.4">
+<h3><span class="header-section-number">1.4.4</span> project版本控制和团队协作</h3>
+<p><strong>版本控制系统</strong>：<a href="https://git-scm.com/book/zh/v2">git知识学习</a></p>
+<ul>
+<li><p>什么是“版本控制”？我为什么要关心它呢？ 版本控制是一种记录一个或若干文件内容变化，以便将来查阅特定版本修订情况的系统。</p></li>
+<li><p>我们对保存着软件源代码的文件作版本控制，但实际上，你可以对任何类型的文件进行版本控制。</p></li>
+</ul>
+<p><strong>代码托管和协作</strong>：<a href="https://pages.github.com/">github网站</a></p>
+<ul>
+<li><p>注册github账号（请用你们西农邮箱注册，高校邮箱github有惊喜）。</p></li>
+<li><p>安装github桌面软件（如果熟练掌握了git命令操作，这一步骤可以跳过）。</p></li>
+<li><p>后github就是我们的交流平台了——你们可以管理文件、托管R代码和版本控制,并进行协作。</p></li>
+</ul>
+</div>
+</div>
+<div id="recommends-AE" class="section level2" number="1.5">
+<h2><span class="header-section-number">1.5</span> 关于计量经济学习的几点建议</h2>
+<p>可以参看我博文中的几点拙论：“计量经济学的那点调性和套路”（<a href="https://home.huhuaping.com/2019/03/10/chating-and-teaching-in-econometrics-manner/">点击访问博文</a>）</p>
+</div>
+<div id="recommends-coding" class="section level2" number="1.6">
+<h2><span class="header-section-number">1.6</span> 关于编程语言的几点建议</h2>
+<ul>
+<li><p>人在江湖走，该有的技能还得练到手！</p></li>
+<li><p>技术手段是不断发展变化的，要有拥抱未来的情怀！R或Rmarkdown也只是选择之一，不是唯一。够你用和适合你就行！</p></li>
+<li><p>坚持并常用，才是熟练掌握一门语言的根本所在！R和Rmarkdown，就跟你学英语一样。相信我，半年不学不用，你的英语也就忘得差不多了！</p></li>
+<li><p>不要看翻译成中文的图书或“教程”！编程语言都是英语的世界！你坚持用英语，顶住了最开始的吃力、费解和艰难，后面必然就是你得胜凯旋的荣光时刻！</p></li>
+</ul>
+</div>
+<div id="参考文献" class="section level2 unnumbered">
+<h2>参考文献</h2>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-ludwig2007" class="csl-entry">
+Ludwig J, Miller D L. Does <span>Head Start</span> Improve Children’s Life Chances? <span>Evidence</span> from a Regression Discontinuity Design[J]. The Quarterly journal of economics, 2007, 122(1): 159–208.
+</div>
+<div id="ref-robinson1988" class="csl-entry">
+Robinson P M. Root-<span>N-consistent</span> Semiparametric Regression[J]. Econometrica: Journal of the Econometric Society, 1988, : 931–954.
+</div>
+</div>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="lab-mean-est.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook/js/app.min.js"></script>
+<script src="libs/gitbook/js/lunr.js"></script>
+<script src="libs/gitbook/js/clipboard.min.js"></script>
+<script src="libs/gitbook/js/plugin-search.js"></script>
+<script src="libs/gitbook/js/plugin-sharing.js"></script>
+<script src="libs/gitbook/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook/js/jquery.highlight.js"></script>
+<script src="libs/gitbook/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "section",
+"toc_depth": 5,
+"scroll_highlight": true
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

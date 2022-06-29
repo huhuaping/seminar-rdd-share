@@ -1,0 +1,125 @@
+
+\mainmatter
+
+# R语言在计量经济的应用（新手启蒙） {#lab-R-beginner}
+
+```{r, message=FALSE, warning=FALSE}
+#| echo = FALSE
+library(here)
+source(here("R/set-global-for-lab.R"), encoding = "UTF-8")
+source(here("R/load-pkg.R"), encoding = "UTF-8")
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+在这个部分，我将就如下一些话题做一些介绍，并会进行现场操作展示。
+
+## 现代开源统计软件的趋势特点{#open-source}
+
+### 封闭VS开源
+
+### 文学化编程
+
+
+## R在论文写作和项目协作中的应用{#the-useage}
+
+参看我的在线书稿：[**R漂流记**](https://rworld.huhuaping.com/)，尤其是[**第8章学术助手**](https://rworld.huhuaping.com/research-assistant.html)。
+
+### 科技论文写作演示（现场操作）
+
+### 科研项目写作演示（现场操作）
+
+
+## R及Rstudio简介{#Rstudio-intro}
+
+### Rstudio基本视窗
+
+安装R软件和第三方编译软件Rstudio
+
+（开源软件，免费公开，自行安装）
+
+- `R CRAN`主站下载安装R程序(根据自己的电脑操作系统选择)。[网址`https://cran.r-project.org/`](https://cran.r-project.org/)
+
+- `Rstudio`主站下载安装Rstudio软件。[网址`https://www.rstudio.com/`](https://www.rstudio.com/)
+ 
+
+### 项目文件结构
+
+### R包（R packages）
+
+### R编程风格：Classic  R VS tidyvese R 
+
+
+## 一些R学习资源{#resources}
+
+
+R语言及Rmarkdown语言快速上手参考资料 。
+
+**说明**：
+
+本文档中提到的图书pdf文件可以通过百度云下载（[下载地址](https://pan.baidu.com/s/1ZRuVSf2Jv_u3C_XmAUingA)：`https://pan.baidu.com/s/1ZRuVSf2Jv_u3C_XmAUingA`）。
+
+下载地址永久有效！如有问题请反馈`wsad2008@gmail.com`。
+
+材料仅供学习交流使用，请尊重原作者的版权！祝大家开心学习，学有所成！
+
+
+### 用R进行编程统计分析
+    
+- Adler, J. R in a Nutshell (2ed) [M], Reilly, 2012.这是R语言学习的红宝书之一，手中常备，随时翻阅。建议要通览一遍，并对照实例运行代码。 
+
+- Crawley, M. J. The R Book (2nd) [M], Wiley, 2013. 这是R语言学习的红宝书之二。两本红宝书写作风格不同，自己挑一本就行。
+
+- Wickham, H. and G. Grolemund. R for Data Science: Import, Tidy, Transform, Visualize, and Model Data  [M], O’Reilly Media, 2017. 这是Hadley大神的一大力作。这是进入R语言统计功力快速升级的超级秘笈！它让你能很快找到指哪打哪的酣畅淋漓！你会因为它更加热爱R！建议在红宝书之后务必要好好学习这本秘籍！
+
+- Hadley, W. Advanced R  [M], CRC Press, 2015.（高级进阶学习，更深入地认识R语言的基本奥义。建议后续学习。简单说，要成为R高手，就应该参透R语言的内部逻辑和底层架构！）
+
+### 用R进行绘图（图形可视化）
+
+- Hadley, W. ggplot2: Elegant Graphics for Data Analysis  [M], Springer, 2016. 没错，这又是Hadley大神出品。R可视化绘图ggplot2的创造者。说实话，他的文笔简练精准，毫不拖泥带水。真的把ggplot2绘图思想说得一清二楚！让你的R可视化技能瞬间提升N级。
+
+### 用R来写文章
+
+Rmarkdown语言与谢益辉大神：
+    
+- 关注一个[bookdown网站https://bookdown.org/](https://bookdown.org/)。里面都是用Rmarkdown写的书，免费下载，书籍内容作者还会不断更新！改变了出版行业！下面几本书都可以在线阅读和下载！！（神奇吧！）
+
+- Xie, Y. Dynamic Documents with R and knitr [M], Chapman & Hall/CRC, 2015. 谢大神的一本书，基本让你明白为什么可以抛弃word、ppt……
+
+- Xie, Y. bookdown: Authoring Books and Technical Documents with R Markdown [M], Chapman & Hall _ CRC 2016. 谢大神的又一本书，他开发的bookdown包，让你真正的可以抛弃word、ppt……
+
+- yihui, X. R Markdown: The Definitive Guide  [M]2018. 谢大神的新作，你可以完全掌握Rmarkdown了。
+
+### project版本控制和团队协作
+
+**版本控制系统**：[git知识学习](https://git-scm.com/book/zh/v2)
+
+- 什么是“版本控制”？我为什么要关心它呢？ 版本控制是一种记录一个或若干文件内容变化，以便将来查阅特定版本修订情况的系统。 
+
+- 我们对保存着软件源代码的文件作版本控制，但实际上，你可以对任何类型的文件进行版本控制。
+
+**代码托管和协作**：[github网站](https://pages.github.com/)
+
+- 注册github账号（请用你们西农邮箱注册，高校邮箱github有惊喜）。
+
+- 安装github桌面软件（如果熟练掌握了git命令操作，这一步骤可以跳过）。
+
+- 后github就是我们的交流平台了——你们可以管理文件、托管R代码和版本控制,并进行协作。
+
+## 关于计量经济学习的几点建议{#recommends-AE}
+
+可以参看我博文中的几点拙论：“计量经济学的那点调性和套路”（[点击访问博文](https://home.huhuaping.com/2019/03/10/chating-and-teaching-in-econometrics-manner/)）
+
+## 关于编程语言的几点建议{#recommends-coding}
+
+- 人在江湖走，该有的技能还得练到手！
+
+- 技术手段是不断发展变化的，要有拥抱未来的情怀！R或Rmarkdown也只是选择之一，不是唯一。够你用和适合你就行！
+
+- 坚持并常用，才是熟练掌握一门语言的根本所在！R和Rmarkdown，就跟你学英语一样。相信我，半年不学不用，你的英语也就忘得差不多了！
+
+- 不要看翻译成中文的图书或“教程”！编程语言都是英语的世界！你坚持用英语，顶住了最开始的吃力、费解和艰难，后面必然就是你得胜凯旋的荣光时刻！
+
+## 参考文献{-}
+
+<div id="refs"></div>
+
