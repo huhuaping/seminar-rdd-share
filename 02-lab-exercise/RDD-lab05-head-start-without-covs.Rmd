@@ -77,7 +77,7 @@ $c=59.1984$。将使用**子样本数据**的样本数为$n=2783$。
 library(haven)
 library(here)
 dt_path <- here::here("data/LM2007.dta")
-dat <- read_dta(dt_path)
+dat <- haven::read_dta(file = dt_path)     # read_dta(dt_path)
 y <- dat$mort_age59_related_postHS
 x <- dat$povrate60
 
@@ -155,7 +155,16 @@ smry_grouped %>%
 #### basic plot ####
 lwd <- 0.6
 fsize <- 16
+
+lbl <- latex2exp::TeX("$X|x=c_0$")
+
 p0 <- ggplot() +
+  geom_point(aes(x=X, y=Y, color = as.factor(D)), data = dt_head) +
+  geom_vline(xintercept = c, color = "red", lty="dashed", alpha = 0.2) +
+  geom_text(aes(x=c+1 , y =20), 
+            label= lbl 
+            ) 
+  
   geom_point(aes(X, Y),data = dt_head, pch=21,alpha=0.6) +
   geom_vline(aes(xintercept=c),
              color = "orange", lty = "dotted", lwd=lwd) +
@@ -867,7 +876,25 @@ smry_new %>%
 
 #### 等价线性回归：OLS估计结果
 
+```{r}
+mod_equiv
+
+lmfit <- lm(formula = mod_equiv, data = dt_hd)
+
+summary(lmfit)
+```
+
+
+
+
+
+
+
 ```{r, results="asis"}
+
+xmerit::lx.est(lm.mod = mod_equiv,
+               lm.dt = dt_hd,lm.n = 2,inf = c("over","fit","Ftest"))
+
 lx_est <- xmerit::lx.est(lm.mod = mod_equiv , 
                          lm.dt = dt_hd, 
                          lm.n = 5,

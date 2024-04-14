@@ -19,6 +19,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### 文学化编程
 
+这里我给大家展示一串数字
+
+
+
 
 ## R在论文写作和项目协作中的应用{#the-useage}
 
